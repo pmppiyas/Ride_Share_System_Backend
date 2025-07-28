@@ -1,4 +1,3 @@
-import { NextFunction } from "ex";
 import { Request, Response, NextFunction } from "express";
 
 type AsyncHandler = (

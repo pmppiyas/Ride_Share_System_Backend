@@ -1,12 +1,22 @@
 import { Schema, model } from "mongoose";
-import { IRider, Role } from "./rider.interfaces";
+import { IRider, IAuths, Role } from "./rider.interfaces";
+
+const authSchema = new Schema<IAuths>(
+  {
+    provider: { type: String, required: true },
+    providerId: { type: String, required: true },
+  },
+  {
+    _id: false,
+  }
+);
 
 const riderSchema = new Schema<IRider>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true, unique: true },
-    password: { type: String },
+    phone: { type: String },
+    password: { type: String, required: true },
     profileImage: { type: String },
     location: {
       lat: { type: Number },
@@ -18,7 +28,8 @@ const riderSchema = new Schema<IRider>(
       default: Role.RIDER,
       required: true,
     },
-    rideHistory: [{ type: Schema.Types.ObjectId, ref: "Ride" }],
+    auths: [authSchema],
+    rideHistory: [{ type: Schema.Types.ObjectId, ref: "Ride", default: [] }],
     isActive: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },
     isSuspended: { type: Boolean, default: false },

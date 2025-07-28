@@ -7,11 +7,16 @@ export enum Role {
   DRIVER = "DRIVER",
 }
 
+interface IAuths {
+  provider: string;
+  providerId: string;
+}
+
 export interface IRider {
   _id?: Types.ObjectId;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   password?: string;
   profileImage?: string;
   location?: {
@@ -19,6 +24,7 @@ export interface IRider {
     lng: number;
   };
   role: Role;
+  auths: IAuths[];
   rideHistory?: Type.ObjectId[];
   isActive: boolean;
   isVerified: boolean;
