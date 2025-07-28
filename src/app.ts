@@ -1,8 +1,6 @@
-import { express } from "x";
-import { cors } from "cor";
+import cors from "cors";
 import express, { Request, Response } from "express";
 import express from "express";
-import cors from "cors";
 
 const app = express();
 app.use(express.json());
@@ -14,3 +12,5 @@ app.get("/", async (req: Request, res: Response) => {
     message: "Hello, Welcome to Ride Shere Server",
   });
 });
+
+export default app;
