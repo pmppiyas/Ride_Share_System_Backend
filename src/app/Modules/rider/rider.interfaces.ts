@@ -7,7 +7,7 @@ export enum Role {
   DRIVER = "DRIVER",
 }
 
-interface IAuths {
+export interface IAuths {
   provider: string;
   providerId: string;
 }
@@ -25,7 +25,7 @@ export interface IRider {
   };
   role: Role;
   auths: IAuths[];
-  rideHistory?: Type.ObjectId[];
+  rideHistory?: Types.ObjectId[];
   isActive: boolean;
   isVerified: boolean;
   isSuspended: boolean;

@@ -4,7 +4,7 @@ import { hashingPassword } from "./../../utils/hashingPassword";
 
 const createRider = async (payload: IRider) => {
   try {
-    const { phone, email, password, ...rest } = payload;
+    const { auths, phone, email, password, ...rest } = payload;
 
     const isEmailExist = await Rider.findOne({ email });
     if (isEmailExist) {
@@ -36,7 +36,6 @@ const createRider = async (payload: IRider) => {
 
     const riderObj = rider.toObject();
     delete riderObj.password;
-
     return riderObj;
   } catch (error) {
     console.log(error);
