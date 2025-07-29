@@ -9,6 +9,7 @@ export const riderZodSchema = z.object({
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, {
       message: "Please enter a valid email address",
     }),
+
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters" })
@@ -19,6 +20,10 @@ export const riderZodSchema = z.object({
           "Password must include uppercase, lowercase, number, and special character",
       }
     ),
+  phone: z.string().regex(/^01[3-9]\d{8}$/, {
+    message: "Invalid Bangladeshi phone number",
+  }),
+
   profileImage: z.string().url().optional(),
   location: z
     .object({
