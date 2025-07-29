@@ -1,7 +1,7 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import express from "express";
 import router from "./app/Routes/index";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 
 const app = express();
 app.use(express.json());
@@ -14,5 +14,7 @@ app.get("/", async (req: Request, res: Response) => {
     message: "Hello, Welcome to Ride Shere Server",
   });
 });
+
+app.use(globalErrorHandler);
 
 export default app;
