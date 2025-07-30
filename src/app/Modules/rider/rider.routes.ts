@@ -13,4 +13,6 @@ router.post(
 
 router.get("/", RiderController.getAllRiders);
 
+router.patch("/update/:id", RiderController.updateRider);
+
 export const RiderRoutes = router;

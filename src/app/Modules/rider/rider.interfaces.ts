@@ -7,6 +7,12 @@ export enum Role {
   DRIVER = "DRIVER",
 }
 
+export enum IsActive {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  BLOCK = "BLOCK",
+}
+
 export interface IAuths {
   provider: string;
   providerId: string;
@@ -26,7 +32,8 @@ export interface IRider {
   role: Role;
   auths: IAuths[];
   rideHistory?: Types.ObjectId[];
-  isActive: boolean;
+  isActive: IsActive;
   isVerified: boolean;
+  isDeleted: boolean;
   isSuspended: boolean;
 }

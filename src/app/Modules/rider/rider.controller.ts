@@ -30,7 +30,21 @@ const getAllRiders = catchAsync(
     });
   }
 );
+
+const updateRider = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const rider = await RiderServices.updateRider(req.params.id, req.body);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Rider updated successfully",
+      data: rider,
+    });
+  }
+);
+
 export const RiderController = {
   createRider,
   getAllRiders,
+  updateRider,
 };

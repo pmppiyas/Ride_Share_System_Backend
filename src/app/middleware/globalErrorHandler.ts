@@ -6,7 +6,7 @@ import httpStatus from "http-status-codes";
 import { AppError } from "../Error/appError";
 import {
   handleDuplicateError,
-  handleZodValidatonError,
+  handleZodValidationError,
   validationError,
 } from "../helper/ErrorHelperFunction";
 export const globalErrorHandler = (
@@ -34,7 +34,7 @@ export const globalErrorHandler = (
 
   // Zod Error
   if (err.name === "ZodError") {
-    message = handleZodValidatonError(err).message;
+    message = handleZodValidationError(err).message;
     statusCode = httpStatus.NOT_ACCEPTABLE;
   }
 

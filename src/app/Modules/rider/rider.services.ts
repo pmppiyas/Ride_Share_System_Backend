@@ -2,7 +2,8 @@ import { IRider } from "./rider.interfaces";
 import { Rider } from "./rider.model";
 import { hashingPassword } from "./../../utils/hashingPassword";
 import { QueryBuilder } from "../../utils/QueryBuilder";
-
+import { AppError } from "../../Error/appError";
+import httpStatus from "http-status-codes";
 const createRider = async (payload: IRider) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { auths, phone, email, password, ...rest } = payload;
@@ -24,7 +25,7 @@ const createRider = async (payload: IRider) => {
   return riderObj;
 };
 
-export const getAllRider = async (query: Record<string, string> = {}) => {
+const getAllRider = async (query: Record<string, string> = {}) => {
   const riderSearchableFields = ["name", "phone", "email"];
 
   const queryBuilder = new QueryBuilder(Rider.find(), query)
@@ -45,7 +46,21 @@ export const getAllRider = async (query: Record<string, string> = {}) => {
   };
 };
 
+const updateRider = async (id: string, payload: Partial<IRider>) => {
+  const rider = await Rider.findById(id);
+  if (!rider) {
+    throw new AppError(httpStatus.ACCEPTED, "Rider not found.");
+  }
+  const updatedRider = Rider.findByIdAndUpdate(id, payload, {
+    runValidators: true,
+    new: true,
+  });
+
+  return updatedRider;
+};
+
 export const RiderServices = {
   createRider,
   getAllRider,
+  updateRider,
 };

@@ -35,7 +35,7 @@ export const handleDuplicateError = (err: any) => {
   };
 };
 
-export const handleZodValidatonError = (err: any) => {
+export const handleZodValidationError = (err: any) => {
   resetState();
 
   if (!err || !err.errors || typeof err.errors !== "object") {

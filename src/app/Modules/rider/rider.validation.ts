@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "./rider.interfaces";
+import { IsActive, Role } from "./rider.interfaces";
 
 export const riderZodSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -43,7 +43,7 @@ export const riderZodSchema = z.object({
     )
     .optional(),
   rideHistory: z.array(z.string()).optional(),
-  isActive: z.boolean().default(true),
+  isActive: z.string().default(IsActive.ACTIVE),
   isVerified: z.boolean().default(false),
   isSuspended: z.boolean().default(false),
 });

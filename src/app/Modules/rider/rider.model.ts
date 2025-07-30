@@ -1,5 +1,5 @@
-import { Schema, model, Types } from "mongoose";
-import { IRider, IAuths, Role } from "./rider.interfaces";
+import { Schema, model } from "mongoose";
+import { IRider, IAuths, Role, IsActive } from "./rider.interfaces";
 
 const authSchema = new Schema<IAuths>({
   provider: { type: String, required: true },
@@ -29,8 +29,14 @@ const riderSchema = new Schema<IRider>(
     },
 
     rideHistory: [{ type: Schema.Types.ObjectId, ref: "Ride", default: [] }],
-    isActive: { type: Boolean, default: true },
+
+    isActive: {
+      type: String,
+      enum: Object.values(IsActive),
+      default: IsActive.ACTIVE,
+    },
     isVerified: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
     isSuspended: { type: Boolean, default: false },
   },
   {
