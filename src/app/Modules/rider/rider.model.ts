@@ -11,7 +11,12 @@ const riderSchema = new Schema<IRider>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, unique: true, index: true },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: function () {
+        return !this.auths?.length;
+      },
+    },
     profileImage: { type: String },
     location: {
       lat: { type: Number },

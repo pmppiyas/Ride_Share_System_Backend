@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 const router = Router();
 import passport from "passport";
+import { AUthControllers } from "./auth.controller";
 
 router.get(
   "/google",
@@ -12,6 +13,15 @@ router.get(
       state: redirect as string,
     })(req, res, next);
   }
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate(
+    "google",
+    { failureRedirect: "/login" },
+    AUthControllers.googleCallback
+  )
 );
 
 export const AuthRoutes = router;

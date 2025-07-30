@@ -3,10 +3,7 @@ import passport from "passport";
 import { Rider } from "../app/Modules/rider/rider.model";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { envVars } from "./env";
-import {
-  Profile,
-  VerifyCallback,
-} from "./../../node_modules/@types/passport-google-oauth20/index.d";
+
 import { Role } from "../app/Modules/rider/rider.interfaces";
 
 passport.use(
@@ -15,13 +12,9 @@ passport.use(
       clientID: envVars.GOOGLE_CLIENT_ID,
       clientSecret: envVars.GOOGLE_CLIENT_SECRET,
       callbackURL: envVars.GOOGLE_CALLBACK_URL,
+      passReqToCallback: true,
     },
-    async (
-      accessToken: string,
-      refreshToken: string,
-      profile: Profile,
-      done: VerifyCallback
-    ) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails?.[0]?.value;
 
