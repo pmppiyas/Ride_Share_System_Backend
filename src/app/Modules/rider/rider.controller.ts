@@ -43,8 +43,21 @@ const updateRider = catchAsync(
   }
 );
 
+const deleteRider = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const rider = await RiderServices.deleteRider(req.params.id);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Rider updated successfully",
+      data: rider,
+    });
+  }
+);
+
 export const RiderController = {
   createRider,
   getAllRiders,
   updateRider,
+  deleteRider,
 };

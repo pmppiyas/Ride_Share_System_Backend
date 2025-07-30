@@ -59,8 +59,18 @@ const updateRider = async (id: string, payload: Partial<IRider>) => {
   return updatedRider;
 };
 
+const deleteRider = async (id: string) => {
+  const rider = await Rider.findById(id);
+  if (!rider) {
+    throw new AppError(httpStatus.ACCEPTED, "Rider not found to delete.");
+  }
+  const deleteRider = await Rider.findByIdAndDelete(id);
+  return deleteRider;
+};
+
 export const RiderServices = {
   createRider,
   getAllRider,
   updateRider,
+  deleteRider,
 };

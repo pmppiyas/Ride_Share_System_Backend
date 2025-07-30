@@ -13,6 +13,12 @@ router.post(
 
 router.get("/", RiderController.getAllRiders);
 
-router.patch("/update/:id", RiderController.updateRider);
+router.patch(
+  "/update/:id",
+  validateRequest(riderZodSchema.partial()),
+  RiderController.updateRider
+);
+
+router.delete("/delete/:id", RiderController.deleteRider);
 
 export const RiderRoutes = router;
