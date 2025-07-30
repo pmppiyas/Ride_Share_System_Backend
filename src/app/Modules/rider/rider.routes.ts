@@ -11,4 +11,6 @@ router.post(
   RiderController.createRider
 );
 
+router.get("/", RiderController.getAllRiders);
+
 export const RiderRoutes = router;

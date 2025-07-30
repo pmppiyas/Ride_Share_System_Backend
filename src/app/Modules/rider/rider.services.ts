@@ -23,6 +23,12 @@ const createRider = async (payload: IRider) => {
   return riderObj;
 };
 
+const getAllRider = async () => {
+  const riders = Rider.find({});
+  return riders;
+};
+
 export const RiderServices = {
   createRider,
+  getAllRider,
 };

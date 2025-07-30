@@ -16,6 +16,19 @@ const createRider = catchAsync(
   }
 );
 
+const getAllRiders = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const riders = await RiderServices.getAllRider();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All rider retrieved successfully",
+      data: riders,
+    });
+  }
+);
 export const RiderController = {
   createRider,
+  getAllRiders,
 };
