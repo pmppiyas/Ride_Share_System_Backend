@@ -6,12 +6,10 @@ import passport from "passport";
 import session from "express-session";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
+import "./config/passport";
 import { envVars } from "./config/env";
 
 const app = express();
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(
   session({
@@ -24,6 +22,8 @@ app.use(
     },
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json());
 app.use(cors());
