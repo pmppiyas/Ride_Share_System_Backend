@@ -24,7 +24,7 @@ export const riderZodSchema = z.object({
     message: "Invalid Bangladeshi phone number",
   }),
 
-  profileImage: z.string().url().optional(),
+  profileImage: z.string().optional(),
   location: z
     .object({
       lat: z.number(),

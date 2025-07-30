@@ -18,7 +18,9 @@ const createRider = catchAsync(
 
 const getAllRiders = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const riders = await RiderServices.getAllRider();
+    const riders = await RiderServices.getAllRider(
+      req.query as Record<string, string>
+    );
 
     sendResponse(res, {
       success: true,

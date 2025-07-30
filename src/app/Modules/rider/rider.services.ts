@@ -1,6 +1,7 @@
 import { IRider } from "./rider.interfaces";
 import { Rider } from "./rider.model";
 import { hashingPassword } from "./../../utils/hashingPassword";
+import { QueryBuilder } from "../../utils/QueryBuilder";
 
 const createRider = async (payload: IRider) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,9 +24,25 @@ const createRider = async (payload: IRider) => {
   return riderObj;
 };
 
-const getAllRider = async () => {
-  const riders = Rider.find({});
-  return riders;
+export const getAllRider = async (query: Record<string, string> = {}) => {
+  const riderSearchableFields = ["name", "phone", "email"];
+
+  const queryBuilder = new QueryBuilder(Rider.find(), query)
+    .filter()
+    .search(riderSearchableFields)
+    .sort()
+    .fields()
+    .paginate();
+
+  const [data, meta] = await Promise.all([
+    queryBuilder.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return {
+    tours: data,
+    meta,
+  };
 };
 
 export const RiderServices = {
