@@ -6,6 +6,7 @@ interface EnvConfig {
   DB_URL: string;
   NODE_ENV: "development" | "production";
   BCRYPT_SALT_ROUND: string;
+  EXPRESS_SESSION_SECRET: string;
 }
 
 const loadEnvVars = (): EnvConfig => {
@@ -14,6 +15,7 @@ const loadEnvVars = (): EnvConfig => {
     "DB_URL",
     "NODE_ENV",
     "BCRYPT_SALT_ROUND",
+    "EXPRESS_SESSION_SECRET",
   ];
   requiredEnvVars.forEach((key) => {
     if (!process.env[key]) {
@@ -25,6 +27,7 @@ const loadEnvVars = (): EnvConfig => {
     DB_URL: process.env.DB_URL as string,
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
     BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string,
+    EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
   };
 };
 
