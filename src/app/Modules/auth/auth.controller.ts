@@ -11,6 +11,7 @@ import { createUserToken } from "../../utils/userToken";
 import { setAuthCookie } from "../../utils/setCookie";
 import { clearAuthCookies } from "../../utils/clearCookie";
 import { AuthServices } from "./auth.services";
+import { JwtPayload } from "jsonwebtoken";
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -102,9 +103,31 @@ const getNewAccessToken = catchAsync(
   }
 );
 
+const resetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const oldPassword = req.body.oldPassword;
+    const newInputPassword = req.body.newPassword;
+    const decodedToken = req.user;
+
+    await AuthServices.resetPassword(
+      oldPassword,
+      newInputPassword,
+      decodedToken as JwtPayload
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Password reset successfully",
+      data: null,
+    });
+  }
+);
+
 export const AuthControllers = {
   googleCallback,
   credentialsLogin,
   logout,
   getNewAccessToken,
+  resetPassword,
 };

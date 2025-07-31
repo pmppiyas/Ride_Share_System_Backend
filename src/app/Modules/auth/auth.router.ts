@@ -9,6 +9,8 @@ router.post("/logout", AuthControllers.logout);
 
 router.post("/refresh-token", AuthControllers.getNewAccessToken);
 
+router.post("/reset-password", AuthControllers.resetPassword);
+
 router.get(
   "/google",
   async (req: Request, res: Response, next: NextFunction) => {
