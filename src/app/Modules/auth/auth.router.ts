@@ -19,11 +19,7 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate(
-    "google",
-    { failureRedirect: "/login" },
-    AuthControllers.googleCallback
-  )
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  AuthControllers.googleCallback
 );
-
 export const AuthRoutes = router;

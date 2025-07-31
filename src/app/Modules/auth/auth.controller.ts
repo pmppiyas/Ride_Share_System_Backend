@@ -8,6 +8,7 @@ import { envVars } from "../../../config/env";
 import passport from "passport";
 import sendResponse from "../../utils/sendResponse";
 import { createUserToken } from "../../utils/userToken";
+import { setAuthCookie } from "../../utils/setCookie";
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -24,8 +25,17 @@ const googleCallback = catchAsync(
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
+    const tokenInfo = await createUserToken(user);
+
+    setAuthCookie(res, tokenInfo);
 
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Google login successfully",
+      data: null,
+    });
   }
 );
 
@@ -41,6 +51,8 @@ const credentialsLogin = catchAsync(
       }
 
       const userToken = createUserToken(user);
+
+      setAuthCookie(res, userToken);
 
       const { password: _password, ...rest } = user.toObject();
 
