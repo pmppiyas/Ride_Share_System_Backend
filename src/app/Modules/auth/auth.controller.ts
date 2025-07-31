@@ -9,6 +9,7 @@ import passport from "passport";
 import sendResponse from "../../utils/sendResponse";
 import { createUserToken } from "../../utils/userToken";
 import { setAuthCookie } from "../../utils/setCookie";
+import { clearAuthCookies } from "../../utils/clearCookie";
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -70,7 +71,20 @@ const credentialsLogin = catchAsync(
   }
 );
 
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    clearAuthCookies(res);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Logout successfully",
+      data: null,
+    });
+  }
+);
+
 export const AuthControllers = {
   googleCallback,
   credentialsLogin,
+  logout,
 };

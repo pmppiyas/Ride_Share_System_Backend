@@ -5,6 +5,8 @@ const router = Router();
 
 router.post("/login", AuthControllers.credentialsLogin);
 
+router.post("/logout", AuthControllers.logout);
+
 router.get(
   "/google",
   async (req: Request, res: Response, next: NextFunction) => {
