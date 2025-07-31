@@ -10,6 +10,7 @@ import sendResponse from "../../utils/sendResponse";
 import { createUserToken } from "../../utils/userToken";
 import { setAuthCookie } from "../../utils/setCookie";
 import { clearAuthCookies } from "../../utils/clearCookie";
+import { AuthServices } from "./auth.services";
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -83,8 +84,27 @@ const logout = catchAsync(
   }
 );
 
+const getNewAccessToken = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies["refresh-token"];
+    const tokenInfo = await AuthServices.getNewAccessToken(
+      refreshToken as string
+    );
+
+    setAuthCookie(res, tokenInfo);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "New Token Genarete Successfully",
+      data: tokenInfo,
+    });
+  }
+);
+
 export const AuthControllers = {
   googleCallback,
   credentialsLogin,
   logout,
+  getNewAccessToken,
 };

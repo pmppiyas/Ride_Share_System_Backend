@@ -1,6 +1,10 @@
 import { envVars } from "../../config/env";
-import { IRider } from "../Modules/rider/rider.interfaces";
-import { generateToken } from "./jwt";
+import { AppError } from "../Error/appError";
+import { IRider, IsActive } from "../Modules/rider/rider.interfaces";
+import { generateToken, verifyToken } from "./jwt";
+import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import { Rider } from "../Modules/rider/rider.model";
 
 export const createUserToken = (user: Partial<IRider>) => {
   const jwtPayload = {
@@ -24,4 +28,42 @@ export const createUserToken = (user: Partial<IRider>) => {
     accessToken,
     refreshToken,
   };
+};
+
+export const createNewAccessTokenWithRefreshToken = async (
+  refreshToken: string
+) => {
+  if (!refreshToken) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "No refreh token recived from cookies."
+    );
+  }
+  const verifyRefreshToken = verifyToken(
+    refreshToken,
+    envVars.JWT_REFRESH_SECRET
+  ) as JwtPayload;
+
+  const isUserExist = await Rider.findOne({ email: verifyRefreshToken.email });
+
+  if (!isUserExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");
+  }
+
+  if (
+    isUserExist.isActive === IsActive.BLOCK ||
+    isUserExist.isActive === IsActive.INACTIVE
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `User is ${isUserExist.isActive}`
+    );
+  }
+
+  if (isUserExist.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is deleted");
+  }
+
+  const accessToken = createUserToken(isUserExist);
+  return accessToken;
 };
