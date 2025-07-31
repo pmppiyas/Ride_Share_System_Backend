@@ -2,6 +2,8 @@
 import passport from "passport";
 import { Rider } from "../app/Modules/rider/rider.model";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcryptjs from "bcryptjs";
 import { envVars } from "./env";
 
 import { Role } from "../app/Modules/rider/rider.interfaces";
@@ -28,7 +30,7 @@ passport.use(
           user = await Rider.create({
             email,
             name: profile.displayName,
-            picture: profile.photos?.[0]?.value,
+            profileImage: profile.photos?.[0]?.value,
             role: Role.RIDER,
             auths: [
               {
@@ -63,6 +65,50 @@ passport.use(
         return done(null, user);
       } catch (error) {
         console.log("Google Strategy Error", error);
+        return done(error);
+      }
+    }
+  )
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (identifier: string, password: string, done: any) => {
+      try {
+        const isUserExist = await Rider.findOne({
+          $or: [{ email: identifier }, { phone: identifier }],
+        });
+
+        if (!isUserExist) {
+          return done(null, false, { message: "User not found." });
+        }
+
+        const isGoogleAuthenticated = isUserExist.auths?.some(
+          (providerObjects) => providerObjects.provider === "google"
+        );
+
+        if (isGoogleAuthenticated && !isUserExist.password) {
+          return done(null, false, {
+            message:
+              "You are joined by Google. First login by google and then set a password.",
+          });
+        }
+
+        const isPasswordMatch = await bcryptjs.compare(
+          password,
+          isUserExist.password || ""
+        );
+
+        if (!isPasswordMatch) {
+          return done(null, false, { message: "Password is wrong." });
+        }
+
+        return done(null, isUserExist, { message: "Login successfull." });
+      } catch (error) {
         return done(error);
       }
     }

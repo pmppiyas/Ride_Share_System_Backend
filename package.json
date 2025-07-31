@@ -34,6 +34,7 @@
     "typescript-eslint": "^8.38.0"
   },
   "dependencies": {
+    "@types/passport-local": "^1.0.38",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

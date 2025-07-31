@@ -1,7 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
-const router = Router();
 import passport from "passport";
-import { AUthControllers } from "./auth.controller";
+import { AuthControllers } from "./auth.controller";
+const router = Router();
+
+router.post("/login", AuthControllers.credentialsLogin);
 
 router.get(
   "/google",
@@ -20,7 +22,7 @@ router.get(
   passport.authenticate(
     "google",
     { failureRedirect: "/login" },
-    AUthControllers.googleCallback
+    AuthControllers.googleCallback
   )
 );
 
