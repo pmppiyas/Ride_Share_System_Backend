@@ -11,6 +11,10 @@ interface EnvConfig {
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CALLBACK_URL: string;
   FRONTEND_URL: string;
+  JWT_ACCESS_TOKEN: string;
+  JWT_ACCESS_EXPIRED: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_REFRESH_EXPIRED: string;
 }
 
 const loadEnvVars = (): EnvConfig => {
@@ -24,6 +28,10 @@ const loadEnvVars = (): EnvConfig => {
     "GOOGLE_CLIENT_SECRET",
     "GOOGLE_CALLBACK_URL",
     "FRONTEND_URL",
+    "JWT_ACCESS_TOKEN",
+    "JWT_ACCESS_EXPIRED",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_EXPIRED",
   ];
   requiredEnvVars.forEach((key) => {
     if (!process.env[key]) {
@@ -40,6 +48,9 @@ const loadEnvVars = (): EnvConfig => {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+    JWT_ACCESS_TOKEN: process.env.JWT_ACCESS_TOKEN as string,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
+    JWT_REFRESH_EXPIRED: process.env.JWT_REFRESH_EXPIRED as string,
   };
 };
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import catchAsync from "../../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status-codes";
@@ -5,6 +7,7 @@ import { AppError } from "../../Error/appError";
 import { envVars } from "../../../config/env";
 import passport from "passport";
 import sendResponse from "../../utils/sendResponse";
+import { createUserToken } from "../../utils/userToken";
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +40,8 @@ const credentialsLogin = catchAsync(
         return next(new AppError(httpStatus.NOT_FOUND, info.message));
       }
 
+      const userToken = createUserToken(user);
+
       const { password: _password, ...rest } = user.toObject();
 
       sendResponse(res, {
@@ -44,6 +49,8 @@ const credentialsLogin = catchAsync(
         statusCode: httpStatus.OK,
         message: "User Login Successfully",
         data: {
+          accessToken: userToken.accessToken,
+          refreshToken: userToken.refreshToken,
           user: rest,
         },
       });
