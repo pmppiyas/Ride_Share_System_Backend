@@ -1,12 +1,17 @@
 import { Schema, model } from "mongoose";
 import { IUser, IAuths, Role, IsActive } from "./user.interfaces";
+import {
+  IDiverApprove,
+  IDriverExtension,
+  IDriverStatus,
+} from "../driver/driver.interfaces";
 
 const authSchema = new Schema<IAuths>({
   provider: { type: String, required: true },
   providerId: { type: String, required: true },
 });
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUser & IDriverExtension>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -43,6 +48,27 @@ const UserSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
+
+    // ✅ Driver-specific fields
+    licenseNumber: { type: String, required: false },
+    vehicleInfo: {
+      type: {
+        type: String,
+        enum: ["car", "bike"],
+      },
+      model: String,
+      plateNumber: String,
+    },
+    isAvailable: { type: Boolean },
+    earnings: { type: Number },
+    approvalStatus: {
+      type: String,
+      enum: Object.values(IDiverApprove),
+    },
+    rideStatus: {
+      type: String,
+      enum: Object.values(IDriverStatus),
+    },
   },
   {
     timestamps: true,
@@ -50,4 +76,4 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-export const User = model<IUser>("User", UserSchema);
+export const User = model<IUser & IDriverExtension>("User", UserSchema);
