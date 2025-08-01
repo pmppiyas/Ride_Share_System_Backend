@@ -23,4 +23,6 @@ router.patch(
   DriverControllers.driverApproveHandle
 );
 
+router.get("/approved", DriverControllers.allDrivers);
+
 export const DriverRoutes = router;

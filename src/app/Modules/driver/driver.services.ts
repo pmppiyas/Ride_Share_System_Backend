@@ -100,8 +100,23 @@ const driverApprovalHandle = async (id: string, status: IDiverApprove) => {
     },
   };
 };
+
+const allDrivers = async () => {
+  const allDrivers = await User.find({
+    role: Role.DRIVER,
+    approvalStatus: IDiverApprove.APPROVED,
+  });
+
+  return {
+    data: allDrivers,
+    meta: {
+      total: await allDrivers.length,
+    },
+  };
+};
 export const RiderServices = {
   createDriver,
   allDriverRequest,
   driverApprovalHandle,
+  allDrivers,
 };

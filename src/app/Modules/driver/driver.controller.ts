@@ -48,8 +48,22 @@ const driverApproveHandle = catchAsync(
     });
   }
 );
+
+const allDrivers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await RiderServices.allDrivers();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "All driver retrieved successfully",
+      data: result,
+    });
+  }
+);
 export const DriverControllers = {
   createDriver,
   allDriverRequest,
   driverApproveHandle,
+  allDrivers,
 };
