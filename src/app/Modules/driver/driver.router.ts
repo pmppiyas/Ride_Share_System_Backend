@@ -11,4 +11,6 @@ router.post(
   DriverControllers.createDriver
 );
 
+router.get("/all-driver-request", DriverControllers.allDriverRequest);
+
 export const DriverRoutes = router;

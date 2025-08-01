@@ -50,6 +50,21 @@ const createDriver = async (id: string, payload: IDriverExtension) => {
   return user;
 };
 
+const allDriverRequest = async () => {
+  const result = await User.find({
+    role: Role.DRIVER,
+    approvalStatus: IDiverApprove.PENDING,
+  });
+
+  const countDoc = await result.length;
+  return {
+    data: result,
+    meta: {
+      total: countDoc,
+    },
+  };
+};
 export const RiderServices = {
   createDriver,
+  allDriverRequest,
 };
