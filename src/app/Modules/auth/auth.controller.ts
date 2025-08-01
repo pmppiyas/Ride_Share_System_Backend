@@ -106,12 +106,13 @@ const getNewAccessToken = catchAsync(
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const oldPassword = req.body.oldPassword;
-    const newInputPassword = req.body.newPassword;
+    const newPassword = req.body.newPassword;
+
     const decodedToken = req.user;
 
     await AuthServices.resetPassword(
       oldPassword,
-      newInputPassword,
+      newPassword,
       decodedToken as JwtPayload
     );
 

@@ -19,6 +19,20 @@ const resetPassword = async (
   newPassword: string,
   decodedToken: JwtPayload
 ): Promise<boolean> => {
+  if (!oldPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Give Old Password as (oldPassword)"
+    );
+  }
+
+  if (!newPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Give New Password as (newPassword)"
+    );
+  }
+
   const user = await Rider.findById(decodedToken.userId);
 
   if (!user || !user.password) {
