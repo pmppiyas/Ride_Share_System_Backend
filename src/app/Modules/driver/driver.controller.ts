@@ -31,7 +31,25 @@ const allDriverRequest = catchAsync(
     });
   }
 );
+
+const driverApproveHandle = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { status } = req.body;
+    const result = await RiderServices.driverApprovalHandle(
+      req.params.id,
+      status
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: `Driver ${result.meta.status} successfully`,
+      data: result,
+    });
+  }
+);
 export const DriverControllers = {
   createDriver,
   allDriverRequest,
+  driverApproveHandle,
 };

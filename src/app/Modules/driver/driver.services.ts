@@ -64,7 +64,44 @@ const allDriverRequest = async () => {
     },
   };
 };
+
+const driverApprovalHandle = async (id: string, status: IDiverApprove) => {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Invalid user ID");
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "User is not found.");
+  }
+
+  const isDriver = user.role == Role.DRIVER;
+  if (!isDriver) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "User is not a driver.");
+  }
+
+  if (!status || !Object.values(IDiverApprove).includes(status)) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "Please provide a valid status (pending / approved/ refuse)."
+    );
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { approvalStatus: status },
+    { new: true, runValidators: true }
+  );
+
+  return {
+    data: result,
+    meta: {
+      status: status,
+    },
+  };
+};
 export const RiderServices = {
   createDriver,
   allDriverRequest,
+  driverApprovalHandle,
 };

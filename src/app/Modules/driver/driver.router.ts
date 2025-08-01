@@ -11,6 +11,16 @@ router.post(
   DriverControllers.createDriver
 );
 
-router.get("/all-driver-request", DriverControllers.allDriverRequest);
+router.get(
+  "/all-driver-request",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DriverControllers.allDriverRequest
+);
+
+router.patch(
+  "/request-handle/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DriverControllers.driverApproveHandle
+);
 
 export const DriverRoutes = router;
