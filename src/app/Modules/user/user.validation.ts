@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { IsActive, Role } from "./rider.interfaces";
+import { IsActive, Role } from "./user.interfaces";
 
-export const riderZodSchema = z.object({
+export const UserZodSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z
     .string()
@@ -32,8 +32,8 @@ export const riderZodSchema = z.object({
     })
     .optional(),
   role: z
-    .enum([Role.SUPER_ADMIN, Role.ADMIN, Role.RIDER, Role.DRIVER])
-    .default(Role.RIDER),
+    .enum([Role.SUPER_ADMIN, Role.ADMIN, Role.User, Role.DRIVER])
+    .default(Role.User),
   auths: z
     .array(
       z.object({

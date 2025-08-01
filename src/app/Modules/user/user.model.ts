@@ -1,12 +1,12 @@
 import { Schema, model } from "mongoose";
-import { IRider, IAuths, Role, IsActive } from "./rider.interfaces";
+import { IUser, IAuths, Role, IsActive } from "./user.interfaces";
 
 const authSchema = new Schema<IAuths>({
   provider: { type: String, required: true },
   providerId: { type: String, required: true },
 });
 
-const riderSchema = new Schema<IRider>(
+const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -25,7 +25,7 @@ const riderSchema = new Schema<IRider>(
     role: {
       type: String,
       enum: Object.values(Role),
-      default: Role.RIDER,
+      default: Role.User,
       required: true,
     },
     auths: {
@@ -50,4 +50,4 @@ const riderSchema = new Schema<IRider>(
   }
 );
 
-export const Rider = model<IRider>("Rider", riderSchema);
+export const User = model<IUser>("User", UserSchema);

@@ -9,7 +9,6 @@ type AsyncHandler = (
 const catchAsync =
   (fn: AsyncHandler) => (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch((error: unknown) => {
-      console.log(error);
       next(error);
     });
   };

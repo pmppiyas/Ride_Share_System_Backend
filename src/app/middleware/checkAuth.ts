@@ -4,8 +4,8 @@ import { AppError } from "../Error/appError";
 import { verifyToken } from "../utils/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status-codes";
-import { Rider } from "../Modules/rider/rider.model";
-import { IsActive } from "../Modules/rider/rider.interfaces";
+import { User } from "../Modules/user/user.model";
+import { IsActive } from "../Modules/user/user.interfaces";
 
 export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +31,7 @@ export const checkAuth = (...authRoles: string[]) => {
         );
       }
 
-      const isUserExist = await Rider.findOne({ email: verifiedToken.email });
+      const isUserExist = await User.findOne({ email: verifiedToken.email });
 
       if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");

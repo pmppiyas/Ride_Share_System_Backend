@@ -2,7 +2,7 @@ import { AppError } from "../../Error/appError";
 import { createNewAccessTokenWithRefreshToken } from "../../utils/userToken";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status-codes";
-import { Rider } from "../rider/rider.model";
+import { User } from "../user/user.model";
 import bcryptjs from "bcryptjs";
 import { hashingPassword } from "../../utils/hashingPassword";
 
@@ -33,7 +33,7 @@ const resetPassword = async (
     );
   }
 
-  const user = await Rider.findById(decodedToken.userId);
+  const user = await User.findById(decodedToken.userId);
 
   if (!user || !user.password) {
     throw new AppError(

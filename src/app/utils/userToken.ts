@@ -1,12 +1,12 @@
 import { envVars } from "../../config/env";
 import { AppError } from "../Error/appError";
-import { IRider, IsActive } from "../Modules/rider/rider.interfaces";
+import { IUser, IsActive } from "../Modules/user/user.interfaces";
 import { generateToken, verifyToken } from "./jwt";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import { Rider } from "../Modules/rider/rider.model";
+import { User } from "../Modules/user/user.model";
 
-export const createUserToken = (user: Partial<IRider>) => {
+export const createUserToken = (user: Partial<IUser>) => {
   const jwtPayload = {
     userId: user._id,
     email: user.email,
@@ -44,7 +44,7 @@ export const createNewAccessTokenWithRefreshToken = async (
     envVars.JWT_REFRESH_SECRET
   ) as JwtPayload;
 
-  const isUserExist = await Rider.findOne({ email: verifyRefreshToken.email });
+  const isUserExist = await User.findOne({ email: verifyRefreshToken.email });
 
   if (!isUserExist) {
     throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from "passport";
-import { Rider } from "../app/Modules/rider/rider.model";
+import { User } from "../app/Modules/user/user.model";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcryptjs from "bcryptjs";
 import { envVars } from "./env";
 
-import { Role } from "../app/Modules/rider/rider.interfaces";
+import { Role } from "../app/Modules/user/user.interfaces";
 
 passport.use(
   new GoogleStrategy(
@@ -24,14 +24,14 @@ passport.use(
           return done(null, false, { message: "No email found" });
         }
 
-        let user = await Rider.findOne({ email });
+        let user = await User.findOne({ email });
 
         if (!user) {
-          user = await Rider.create({
+          user = await User.create({
             email,
             name: profile.displayName,
             profileImage: profile.photos?.[0]?.value,
-            role: Role.RIDER,
+            role: Role.User,
             auths: [
               {
                 provider: profile.provider,
@@ -64,7 +64,6 @@ passport.use(
 
         return done(null, user);
       } catch (error) {
-        console.log("Google Strategy Error", error);
         return done(error);
       }
     }
@@ -79,7 +78,7 @@ passport.use(
     },
     async (identifier: string, password: string, done: any) => {
       try {
-        const isUserExist = await Rider.findOne({
+        const isUserExist = await User.findOne({
           $or: [{ email: identifier }, { phone: identifier }],
         });
 
@@ -121,10 +120,9 @@ passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) => {
 
 passport.deserializeUser(async (id: string, done: any) => {
   try {
-    const user = await Rider.findById(id);
+    const user = await User.findById(id);
     done(null, user);
   } catch (error) {
-    console.error("Deserialization error:", error);
     done(error, null);
   }
 });
