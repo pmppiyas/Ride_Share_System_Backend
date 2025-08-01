@@ -25,12 +25,13 @@ const UserSchema = new Schema<IUser>(
     role: {
       type: String,
       enum: Object.values(Role),
-      default: Role.User,
+      default: Role.RIDER,
       required: true,
     },
     auths: {
       type: [authSchema],
       required: true,
+      _id: false,
     },
 
     rideHistory: [{ type: Schema.Types.ObjectId, ref: "Ride", default: [] }],
@@ -42,7 +43,6 @@ const UserSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
-    isSuspended: { type: Boolean, default: false },
   },
   {
     timestamps: true,

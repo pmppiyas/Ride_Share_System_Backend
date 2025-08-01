@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
-  User = "User",
+  RIDER = "Rider",
   DRIVER = "DRIVER",
 }
 
@@ -35,5 +35,4 @@ export interface IUser {
   isActive: IsActive;
   isVerified: boolean;
   isDeleted: boolean;
-  isSuspended: boolean;
 }

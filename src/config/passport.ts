@@ -31,7 +31,7 @@ passport.use(
             email,
             name: profile.displayName,
             profileImage: profile.photos?.[0]?.value,
-            role: Role.User,
+            role: Role.RIDER,
             auths: [
               {
                 provider: profile.provider,
@@ -64,6 +64,7 @@ passport.use(
 
         return done(null, user);
       } catch (error) {
+        console.log("Google Strategy Error", error);
         return done(error);
       }
     }

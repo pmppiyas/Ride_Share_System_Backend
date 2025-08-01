@@ -1,4 +1,4 @@
-import { IUser } from "./user.interfaces";
+import { IAuths, IUser } from "./user.interfaces";
 import { User } from "./user.model";
 import { hashingPassword } from "../../utils/hashingPassword";
 import { QueryBuilder } from "../../utils/QueryBuilder";
@@ -6,17 +6,22 @@ import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
 const createUser = async (payload: IUser) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { auths, phone, email, password, ...rest } = payload;
+  const { auths, email, password, ...rest } = payload;
 
   let hashPassword = "";
   if (password) {
     hashPassword = await hashingPassword(password);
   }
 
+  const authProvider: IAuths = {
+    provider: "credentials",
+    providerId: email as string,
+  };
+
   const user = await User.create({
     email,
-    phone,
     password: hashPassword,
+    auths: [authProvider],
     ...rest,
   });
 

@@ -32,8 +32,8 @@ export const UserZodSchema = z.object({
     })
     .optional(),
   role: z
-    .enum([Role.SUPER_ADMIN, Role.ADMIN, Role.User, Role.DRIVER])
-    .default(Role.User),
+    .enum([Role.SUPER_ADMIN, Role.ADMIN, Role.RIDER, Role.DRIVER])
+    .default(Role.RIDER),
   auths: z
     .array(
       z.object({
@@ -45,5 +45,4 @@ export const UserZodSchema = z.object({
   rideHistory: z.array(z.string()).optional(),
   isActive: z.string().default(IsActive.ACTIVE),
   isVerified: z.boolean().default(false),
-  isSuspended: z.boolean().default(false),
 });

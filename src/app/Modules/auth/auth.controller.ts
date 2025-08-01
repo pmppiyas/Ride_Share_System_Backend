@@ -13,35 +13,6 @@ import { clearAuthCookies } from "../../utils/clearCookie";
 import { AuthServices } from "./auth.services";
 import { JwtPayload } from "jsonwebtoken";
 
-const googleCallback = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    let redirectTo =
-      req.query?.state && typeof req.query.state === "string"
-        ? req.query.state.replace(/^\//, "")
-        : "dashboard";
-
-    if (redirectTo.startsWith("/")) {
-      redirectTo = redirectTo.slice(1);
-    }
-
-    const user = req.user;
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, "User not found");
-    }
-    const tokenInfo = await createUserToken(user);
-
-    setAuthCookie(res, tokenInfo);
-
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Google login successfully",
-      data: null,
-    });
-  }
-);
-
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("local", async (err: any, user: any, info: any) => {
@@ -120,6 +91,35 @@ const resetPassword = catchAsync(
       success: true,
       statusCode: httpStatus.OK,
       message: "Password reset successfully",
+      data: null,
+    });
+  }
+);
+
+const googleCallback = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    let redirectTo =
+      req.query?.state && typeof req.query.state === "string"
+        ? req.query.state.replace(/^\//, "")
+        : "dashboard";
+
+    if (redirectTo.startsWith("/")) {
+      redirectTo = redirectTo.slice(1);
+    }
+
+    const user = req.user;
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+    const tokenInfo = await createUserToken(user);
+
+    setAuthCookie(res, tokenInfo);
+
+    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Google login successfully",
       data: null,
     });
   }
