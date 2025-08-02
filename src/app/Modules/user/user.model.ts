@@ -1,5 +1,7 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { IUser, IAuths, Role, IsActive } from "./user.interfaces";
+mongoose.set("strictQuery", false);
+
 import {
   IDiverApprove,
   IDriverExtension,
@@ -69,7 +71,12 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
       type: String,
       enum: Object.values(IDriverStatus),
     },
-    driveRides: [{ type: Schema.Types.ObjectId, ref: "Ride" }],
+    driveRides: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Ride",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -78,3 +85,17 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
 );
 
 export const User = model<IUser & IDriverExtension>("User", UserSchema);
+
+UserSchema.pre("save", function (next) {
+  if (this.role !== Role.DRIVER) {
+    delete this.driveRides;
+    delete this.licenseNumber;
+    delete this.vehicleInfo;
+    delete this.isAvailable;
+    delete this.earnings;
+    delete this.approvalStatus;
+    delete this.rideStatus;
+  }
+
+  next();
+});

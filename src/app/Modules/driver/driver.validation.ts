@@ -18,5 +18,5 @@ export const driverExtensionSchema = z.object({
   isAvailable: z.boolean(),
   earnings: z.number().optional(),
   approvalStatus: IDiverApproveEnum.optional(),
-  rides: z.array(objectIdSchema).optional(),
+  driveRides: z.array(objectIdSchema).optional(),
 });

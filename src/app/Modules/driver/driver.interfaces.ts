@@ -21,13 +21,13 @@ export enum IDriverStatus {
 }
 
 export interface IDriverExtension {
-  licenseNumber: string;
-  vehicleInfo: IVehicleInfo;
-  isAvailable: boolean;
+  licenseNumber?: string;
+  vehicleInfo?: IVehicleInfo;
+  isAvailable?: boolean;
   earnings?: number;
   approvalStatus?: IDiverApprove;
-  rideStatus: IDriverStatus;
-  driveRides: Types.ObjectId[];
+  rideStatus?: IDriverStatus;
+  driveRides?: Types.ObjectId[];
 }
 
 export type IDriverUser = IUser & IDriverExtension;
