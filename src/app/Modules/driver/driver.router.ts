@@ -2,12 +2,15 @@ import { Router } from "express";
 import { DriverControllers } from "./driver.controller";
 import { checkAuth } from "../../middleware/checkAuth";
 import { Role } from "../user/user.interfaces";
+import { validateRequest } from "../../middleware/validateRequest";
+import { driverExtensionSchema } from "./driver.validation";
 
 const router = Router();
 
 router.post(
   "/register",
   checkAuth(Role.RIDER, Role.DRIVER),
+  validateRequest(driverExtensionSchema),
   DriverControllers.createDriver
 );
 
@@ -23,6 +26,10 @@ router.patch(
   DriverControllers.driverApproveHandle
 );
 
-router.get("/approved", DriverControllers.allDrivers);
+router.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DriverControllers.allDrivers
+);
 
 export const DriverRoutes = router;

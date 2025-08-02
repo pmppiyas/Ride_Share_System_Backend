@@ -1,4 +1,5 @@
 import { IUser } from "../user/user.interfaces";
+import { Types } from "mongoose";
 
 export interface IVehicleInfo {
   type: "car" | "bike";
@@ -26,6 +27,7 @@ export interface IDriverExtension {
   earnings?: number;
   approvalStatus?: IDiverApprove;
   rideStatus: IDriverStatus;
+  driveRides: Types.ObjectId[];
 }
 
 export type IDriverUser = IUser & IDriverExtension;

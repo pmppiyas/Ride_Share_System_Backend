@@ -49,7 +49,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
 
-    // ✅ Driver-specific fields
+    //  Driver-specific fields
     licenseNumber: { type: String, required: false },
     vehicleInfo: {
       type: {
@@ -69,6 +69,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
       type: String,
       enum: Object.values(IDriverStatus),
     },
+    driveRides: [{ type: Schema.Types.ObjectId, ref: "Ride" }],
   },
   {
     timestamps: true,
