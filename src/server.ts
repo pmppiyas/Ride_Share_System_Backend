@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import app from "./app";
 import { seedSUperAdmin } from "./app/utils/seedSuperAdmin";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let server: Server;
 
 const port = envVars.PORT;
@@ -27,3 +26,44 @@ const startServer = async () => {
   await startServer();
   await seedSUperAdmin();
 })();
+
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandle Rejection Detected... Server sutting down", err);
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+
+process.on("uncaughtException", (error) => {
+  console.log("Uncaught exception detected. Server sutting down", error);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+
+process.on("SIGTERM", () => {
+  console.log("Sigterm signal recieved. Server sutting down...");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+
+process.on("SIGINT", () => {
+  console.log("SIGINT signal recieved. Server sutting down...");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
