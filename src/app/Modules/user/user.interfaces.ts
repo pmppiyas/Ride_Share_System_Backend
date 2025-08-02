@@ -18,6 +18,12 @@ export interface IAuths {
   providerId: string;
 }
 
+export interface ILocation {
+  type: "Point";
+  coordinates: [number, number];
+  updatedAt?: Date;
+}
+
 export interface IUser {
   _id?: Types.ObjectId;
   name: string;
@@ -25,10 +31,7 @@ export interface IUser {
   phone?: string;
   password?: string;
   profileImage?: string;
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  location: ILocation;
   role: Role;
   auths: IAuths[];
   rideHistory?: Types.ObjectId[];

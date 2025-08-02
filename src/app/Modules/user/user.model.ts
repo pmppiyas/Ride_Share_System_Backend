@@ -26,8 +26,20 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
     },
     profileImage: { type: String },
     location: {
-      lat: { type: Number },
-      lng: { type: Number },
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
     role: {
       type: String,
@@ -99,3 +111,5 @@ UserSchema.pre("save", function (next) {
 
   next();
 });
+
+UserSchema.index({ location: "2dsphere" });

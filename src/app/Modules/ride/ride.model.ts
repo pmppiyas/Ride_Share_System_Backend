@@ -1,4 +1,4 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 import { IRideStatus } from "./ride.interfaces";
 import { calculateDistance } from "../../utils/calculateDistance";
 
@@ -10,10 +10,10 @@ const locationSchema = new Schema({
 
 const rideSchema = new Schema(
   {
-    rider: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    rider: { type: Schema.Types.ObjectId, ref: "User" },
     driver: { type: Schema.Types.ObjectId, ref: "User" },
-    pickupLocation: locationSchema,
-    destinationLocation: locationSchema,
+    pickupLocation: { type: locationSchema, _id: false },
+    destinationLocation: { type: locationSchema, _id: false },
     status: {
       type: String,
       enum: Object.values(IRideStatus),
@@ -35,8 +35,6 @@ const rideSchema = new Schema(
   }
 );
 
-export const Ride = model("Ride", rideSchema);
-
 rideSchema.pre("save", function (next) {
   if (
     this.pickupLocation?.lat &&
@@ -57,3 +55,5 @@ rideSchema.pre("save", function (next) {
 
   next();
 });
+
+export const Ride = model("Ride", rideSchema);
