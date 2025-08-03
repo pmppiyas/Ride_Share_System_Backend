@@ -149,8 +149,13 @@ const getAllRides = async (query: Record<string, string> = {}) => {
     meta,
   };
 };
+
+const getSingleRide = async (id: string) => {
+  return Ride.findById(id);
+};
 export const RideServices = {
   createRide,
   setRideStatus,
   getAllRides,
+  getSingleRide,
 };
