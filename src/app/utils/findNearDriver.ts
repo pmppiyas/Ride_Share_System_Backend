@@ -1,0 +1,30 @@
+import {
+  IDiverApprove,
+  IDriverStatus,
+} from "../Modules/driver/driver.interfaces";
+import { User } from "../Modules/user/user.model";
+
+export const findNearbyDriver = async (
+  pickupLat: number,
+  pickupLng: number
+) => {
+  const radiusInKM = 5;
+
+  const nearbyDriver = await User.findOne({
+    role: "DRIVER",
+    approvalStatus: IDiverApprove.APPROVED,
+    rideStatus: IDriverStatus.IDLE,
+    isAvailable: true,
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [pickupLng, pickupLat],
+        },
+        $maxDistance: radiusInKM * 1000,
+      },
+    },
+  });
+
+  return nearbyDriver;
+};

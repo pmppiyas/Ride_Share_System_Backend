@@ -1,12 +1,27 @@
 import { Router } from "express";
-import { RiderRoutes } from "./../Modules/rider/rider.routes";
+import { UserRoutes } from "../Modules/user/user.routes";
+import { AuthRoutes } from "../Modules/auth/auth.router";
+import { DriverRoutes } from "../Modules/driver/driver.router";
+import { RideRoutes } from "../Modules/ride/ride.routes";
 
 const router = Router();
 
 const moduleRoutes = [
   {
-    path: "/rider",
-    route: RiderRoutes,
+    path: "/user",
+    route: UserRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
+  {
+    path: "/driver",
+    route: DriverRoutes,
+  },
+  {
+    path: "/ride",
+    route: RideRoutes,
   },
 ];
 
