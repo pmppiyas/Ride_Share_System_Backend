@@ -6,7 +6,8 @@ import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import { IDriverStatus } from "../driver/driver.interfaces";
-export const createRide = async (
+import { QueryBuilder } from "../../utils/QueryBuilder";
+const createRide = async (
   decodedToken: JwtPayload,
   payload: {
     pickupLocation: { lat: number; lng: number; address?: string };
@@ -125,7 +126,36 @@ const setRideStatus = async (rideId: string, status: IRideStatus) => {
   return ride;
 };
 
+const getAllRides = async (query: Record<string, string> = {}) => {
+  const rideSearchableFields = [
+    "status",
+    "pickupLocation.address",
+    "destinationLocation.address",
+  ];
+  const queryBuilder = new QueryBuilder(Ride.find(), query)
+    .filter()
+    .search(rideSearchableFields)
+    .sort()
+    .fields()
+    .paginate();
+
+  const [data, meta] = await Promise.all([
+    queryBuilder.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return {
+    users: data,
+    meta,
+  };
+};
+
+const getSingleRide = async (id: string) => {
+  return Ride.findById(id);
+};
 export const RideServices = {
   createRide,
   setRideStatus,
+  getAllRides,
+  getSingleRide,
 };
