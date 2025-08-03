@@ -17,6 +17,10 @@ router.patch(
   RideControllers.setRideStatus
 );
 
-
+router.get(
+  "/",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  RideControllers.getAllRides
+);
 
 export const RideRoutes = router;

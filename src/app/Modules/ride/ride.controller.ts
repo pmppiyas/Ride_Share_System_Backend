@@ -35,7 +35,23 @@ const setRideStatus = catchAsync(
   }
 );
 
+const getAllRides = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const rides = await RideServices.getAllRides(
+      req.query as Record<string, string>
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: `All rides retrieved successfully`,
+      data: rides,
+    });
+  }
+);
+
 export const RideControllers = {
   createRide,
   setRideStatus,
+  getAllRides,
 };
