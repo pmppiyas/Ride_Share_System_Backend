@@ -11,4 +11,10 @@ router.post(
   RideControllers.createRide
 );
 
+router.patch(
+  "/set-status/:id",
+  checkAuth(Role.DRIVER),
+  RideControllers.setRideStatus
+);
+
 export const RideRoutes = router;

@@ -21,6 +21,21 @@ const createRide = catchAsync(
   }
 );
 
+const setRideStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { status } = req.body;
+    const setStatus = await RideServices.setRideStatus(req.params.id, status);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Ride create successfully",
+      data: setStatus,
+    });
+  }
+);
+
 export const RideControllers = {
   createRide,
+  setRideStatus,
 };

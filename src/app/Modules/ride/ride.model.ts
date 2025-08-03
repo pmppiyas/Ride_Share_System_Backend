@@ -48,9 +48,8 @@ rideSchema.pre("save", function (next) {
       this.destinationLocation.lat,
       this.destinationLocation.lng
     );
-
-    this.distance = dist;
-    this.fare = Math.max(50, dist * 20);
+    this.distance = Number(dist.toFixed(2));
+    this.fare = Number(Math.max(50, dist * 20).toFixed(2));
   }
 
   next();
