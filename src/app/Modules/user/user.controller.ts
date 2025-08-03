@@ -50,7 +50,7 @@ const deleteUser = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "User updated successfully",
+      message: "User deleted successfully",
       data: User,
     });
   }

@@ -13,8 +13,10 @@ router.post(
 
 router.patch(
   "/set-status/:id",
-  checkAuth(Role.DRIVER),
+  checkAuth(Role.DRIVER, Role.RIDER),
   RideControllers.setRideStatus
 );
+
+
 
 export const RideRoutes = router;

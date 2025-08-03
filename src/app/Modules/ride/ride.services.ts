@@ -5,6 +5,7 @@ import { IRideStatus } from "./ride.interfaces";
 import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
+import { IDriverStatus } from "../driver/driver.interfaces";
 export const createRide = async (
   decodedToken: JwtPayload,
   payload: {
@@ -19,9 +20,12 @@ export const createRide = async (
 
   if (!driver)
     throw new AppError(httpStatus.NOT_FOUND, "No available driver nearby");
+  if (!decodedToken) {
+    throw new AppError(httpStatus.NOT_FOUND, "No decodedToken ");
+  }
 
   const ride = new Ride({
-    rider: decodedToken._id,
+    rider: decodedToken.userId,
     driver: driver._id,
     pickupLocation: payload.pickupLocation,
     destinationLocation: payload.destinationLocation,
@@ -32,6 +36,17 @@ export const createRide = async (
   });
 
   await ride.save();
+
+  driver.isAvailable = false;
+
+  await User.findByIdAndUpdate(decodedToken.userId, {
+    $addToSet: { rideHistory: ride._id },
+  });
+  await User.findByIdAndUpdate(ride.driver, {
+    $addToSet: { driveRides: ride._id },
+  });
+
+  await driver.save();
 
   return ride;
 };
@@ -71,21 +86,38 @@ const setRideStatus = async (rideId: string, status: IRideStatus) => {
   switch (status) {
     case IRideStatus.ACCEPTED:
       ride.timestamps.acceptedAt = new Date();
+      await User.findByIdAndUpdate(ride.driver, {
+        isAvailable: true,
+        rideStatus: IDriverStatus.ACCEPTED,
+      });
       break;
     case IRideStatus.PICKED_UP:
       ride.timestamps.pickedUpAt = new Date();
+      await User.findByIdAndUpdate(ride.driver, {
+        isAvailable: true,
+        rideStatus: IDriverStatus.PICKEDUP,
+      });
       break;
     case IRideStatus.IN_TRANSIT:
+      await User.findByIdAndUpdate(ride.driver, {
+        isAvailable: true,
+        rideStatus: IDriverStatus.INTRANSIT,
+      });
       break;
     case IRideStatus.COMPLETED:
       ride.timestamps.completedAt = new Date();
       await User.findByIdAndUpdate(ride.driver, {
-        $addToSet: { driveRides: ride._id },
         $inc: { earnings: ride.fare ?? 0 },
+        isAvailable: true,
+        rideStatus: IDriverStatus.COMPLETED,
       });
       break;
     case IRideStatus.CANCELED:
       ride.timestamps.canceledAt = new Date();
+      await User.findByIdAndUpdate(ride.driver, {
+        isAvailable: true,
+        rideStatus: IDriverStatus.IDLE,
+      });
       break;
   }
 

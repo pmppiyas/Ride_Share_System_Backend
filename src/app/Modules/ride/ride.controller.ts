@@ -29,7 +29,7 @@ const setRideStatus = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "Ride create successfully",
+      message: `Ride ${status} successfully`,
       data: setStatus,
     });
   }

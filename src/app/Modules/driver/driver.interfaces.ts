@@ -15,6 +15,7 @@ export enum IDiverApprove {
 
 export enum IDriverStatus {
   IDLE = "idle",
+  ACCEPTED = "accepted",
   PICKEDUP = "picked_up",
   INTRANSIT = "in_transit",
   COMPLETED = "completed",

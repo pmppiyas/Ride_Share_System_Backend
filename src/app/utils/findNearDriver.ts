@@ -1,4 +1,7 @@
-import { IDiverApprove } from "../Modules/driver/driver.interfaces";
+import {
+  IDiverApprove,
+  IDriverStatus,
+} from "../Modules/driver/driver.interfaces";
 import { User } from "../Modules/user/user.model";
 
 export const findNearbyDriver = async (
@@ -10,6 +13,7 @@ export const findNearbyDriver = async (
   const nearbyDriver = await User.findOne({
     role: "DRIVER",
     approvalStatus: IDiverApprove.APPROVED,
+    rideStatus: IDriverStatus.IDLE,
     isAvailable: true,
     location: {
       $near: {
