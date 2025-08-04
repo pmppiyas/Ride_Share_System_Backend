@@ -8,7 +8,7 @@ export const findNearbyDriver = async (
   pickupLat: number,
   pickupLng: number
 ) => {
-  const radiusInKM = 5;
+  const radiusInKM = 10;
 
   const nearbyDriver = await User.findOne({
     role: "DRIVER",

@@ -3,8 +3,9 @@ import catchAsync from "../../utils/catchAsync";
 import { RideServices } from "./ride.services";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
-
 import { JwtPayload } from "jsonwebtoken";
+import { AppError } from "../../Error/appError";
+
 const createRide = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const ride = await RideServices.createRide(
@@ -63,9 +64,25 @@ const getSingleRides = catchAsync(
   }
 );
 
+const getmyRides = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user;
+
+    const myRides = await RideServices.getMyRide(decodedToken as JwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Your all rides retrieved successfully.",
+      data: myRides,
+    });
+  }
+);
+
 export const RideControllers = {
   createRide,
   setRideStatus,
   getAllRides,
   getSingleRides,
+  getmyRides,
 };

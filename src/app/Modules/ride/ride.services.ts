@@ -7,6 +7,7 @@ import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import { IDriverStatus } from "../driver/driver.interfaces";
 import { QueryBuilder } from "../../utils/QueryBuilder";
+
 const createRide = async (
   decodedToken: JwtPayload,
   payload: {
@@ -153,9 +154,27 @@ const getAllRides = async (query: Record<string, string> = {}) => {
 const getSingleRide = async (id: string) => {
   return Ride.findById(id);
 };
+
+const getMyRide = async (decodedToken: JwtPayload) => {
+  const myRides = await Ride.find({ rider: decodedToken.userId }).populate(
+    "driver",
+    "-_id name phone"
+  );
+
+  const docCount = await Ride.countDocuments({ rider: decodedToken.userId });
+
+  return {
+    data: myRides,
+    meta: {
+      count: docCount,
+    },
+  };
+};
+
 export const RideServices = {
   createRide,
   setRideStatus,
   getAllRides,
   getSingleRide,
+  getMyRide,
 };

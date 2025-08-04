@@ -24,9 +24,14 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/single/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   RideControllers.getSingleRides
 );
 
+router.get(
+  "/my-rides",
+  checkAuth(...Object.values(Role)),
+  RideControllers.getmyRides
+);
 export const RideRoutes = router;
