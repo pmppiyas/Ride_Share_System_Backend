@@ -63,7 +63,9 @@ export class QueryBuilder<T> {
   }
 
   build(): Query<T[], T> {
-    return this.modelQuery;
+    return this.modelQuery
+      .populate("driver", "-_id name phone")
+      .populate("rider", "-_id name phone");
   }
 
   async getMeta(): Promise<{

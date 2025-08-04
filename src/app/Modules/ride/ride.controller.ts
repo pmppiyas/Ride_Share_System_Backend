@@ -4,7 +4,6 @@ import { RideServices } from "./ride.services";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import { AppError } from "../../Error/appError";
 
 const createRide = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +24,11 @@ const createRide = catchAsync(
 const setRideStatus = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { status } = req.body;
-    const setStatus = await RideServices.setRideStatus(req.params.id, status);
+    const setStatus = await RideServices.setRideStatus(
+      req.params.id,
+      status,
+      req.user as JwtPayload
+    );
 
     sendResponse(res, {
       success: true,

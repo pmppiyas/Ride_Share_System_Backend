@@ -53,7 +53,11 @@ const createRide = async (
   return ride;
 };
 
-const setRideStatus = async (rideId: string, status: IRideStatus) => {
+const setRideStatus = async (
+  rideId: string,
+  status: IRideStatus,
+  decodedToken: JwtPayload
+) => {
   const ride = await Ride.findById(rideId);
 
   if (!ride) throw new AppError(httpStatus.NOT_FOUND, "Ride not found");
@@ -71,7 +75,8 @@ const setRideStatus = async (rideId: string, status: IRideStatus) => {
 
   if (
     status === IRideStatus.CANCELED &&
-    irreversibleStatuses.includes(ride.status)
+    irreversibleStatuses.includes(ride.status) &&
+    decodedToken.role !== "driver"
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -89,23 +94,26 @@ const setRideStatus = async (rideId: string, status: IRideStatus) => {
     case IRideStatus.ACCEPTED:
       ride.timestamps.acceptedAt = new Date();
       await User.findByIdAndUpdate(ride.driver, {
-        isAvailable: true,
+        isAvailable: false,
         rideStatus: IDriverStatus.ACCEPTED,
       });
       break;
+
     case IRideStatus.PICKED_UP:
       ride.timestamps.pickedUpAt = new Date();
       await User.findByIdAndUpdate(ride.driver, {
-        isAvailable: true,
+        isAvailable: false,
         rideStatus: IDriverStatus.PICKEDUP,
       });
       break;
+
     case IRideStatus.IN_TRANSIT:
       await User.findByIdAndUpdate(ride.driver, {
-        isAvailable: true,
+        isAvailable: false,
         rideStatus: IDriverStatus.INTRANSIT,
       });
       break;
+
     case IRideStatus.COMPLETED:
       ride.timestamps.completedAt = new Date();
       await User.findByIdAndUpdate(ride.driver, {
@@ -114,6 +122,7 @@ const setRideStatus = async (rideId: string, status: IRideStatus) => {
         rideStatus: IDriverStatus.COMPLETED,
       });
       break;
+
     case IRideStatus.CANCELED:
       ride.timestamps.canceledAt = new Date();
       await User.findByIdAndUpdate(ride.driver, {
@@ -152,7 +161,9 @@ const getAllRides = async (query: Record<string, string> = {}) => {
 };
 
 const getSingleRide = async (id: string) => {
-  return Ride.findById(id);
+  return Ride.findById(id)
+    .populate("driver", "-_id name phone")
+    .populate("rider", "-_id name phone");
 };
 
 const getMyRide = async (decodedToken: JwtPayload) => {
