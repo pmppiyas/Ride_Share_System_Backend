@@ -31,7 +31,7 @@ export const checkAuth = (...authRoles: string[]) => {
         );
       }
 
-      const isUserExist = await User.findOne({ email: verifiedToken.email });
+      const isUserExist = await User.findOne({ _id: verifiedToken.userId });
 
       if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");

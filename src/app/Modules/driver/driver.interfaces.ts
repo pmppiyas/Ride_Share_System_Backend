@@ -15,19 +15,20 @@ export enum IDiverApprove {
 
 export enum IDriverStatus {
   IDLE = "idle",
+  ACCEPTED = "accepted",
   PICKEDUP = "picked_up",
   INTRANSIT = "in_transit",
   COMPLETED = "completed",
 }
 
 export interface IDriverExtension {
-  licenseNumber: string;
-  vehicleInfo: IVehicleInfo;
-  isAvailable: boolean;
+  licenseNumber?: string;
+  vehicleInfo?: IVehicleInfo;
+  isAvailable?: boolean;
   earnings?: number;
   approvalStatus?: IDiverApprove;
-  rideStatus: IDriverStatus;
-  driveRides: Types.ObjectId[];
+  rideStatus?: IDriverStatus;
+  driveRides?: Types.ObjectId[];
 }
 
 export type IDriverUser = IUser & IDriverExtension;

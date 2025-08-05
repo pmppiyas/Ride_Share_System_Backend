@@ -33,7 +33,13 @@ export const seedSUperAdmin = async () => {
       isActive: IsActive.ACTIVE,
       isDeleted: false,
       isVerified: true,
+      location: {
+        type: "Point",
+        coordinates: [89.25, 25.75],
+        updatedAt: new Date(),
+      },
     };
+
     const superAdmin = await User.create(payload);
     console.log("Super Admin Created Successfully! \n");
     console.log(superAdmin);

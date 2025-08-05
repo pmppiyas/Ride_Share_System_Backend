@@ -19,6 +19,12 @@ router.get(
   UserController.getAllUsers
 );
 
+router.get(
+  "/:id",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  UserController.getSingleUser
+);
+
 router.patch(
   "/update/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.DRIVER, Role.RIDER),

@@ -27,7 +27,7 @@ const allDriverRequest = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "Driver create successfully",
+      message: "All requested driver retrieved successfully",
       data: result,
     });
   }

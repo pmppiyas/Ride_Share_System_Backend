@@ -1,6 +1,19 @@
 import { z } from "zod";
 import { IsActive, Role } from "./user.interfaces";
 
+const locationSchema = z.object({
+  type: z.literal("Point"),
+  coordinates: z.tuple([z.number(), z.number()]).refine(
+    ([lng, lat]) => {
+      return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+    },
+    {
+      message: "Invalid coordinates range",
+    }
+  ),
+  updatedAt: z.date().optional(),
+});
+
 export const UserZodSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z
@@ -25,12 +38,7 @@ export const UserZodSchema = z.object({
   }),
 
   profileImage: z.string().optional(),
-  location: z
-    .object({
-      lat: z.number(),
-      lng: z.number(),
-    })
-    .optional(),
+  location: locationSchema,
   role: z
     .enum([Role.SUPER_ADMIN, Role.ADMIN, Role.RIDER, Role.DRIVER])
     .default(Role.RIDER),

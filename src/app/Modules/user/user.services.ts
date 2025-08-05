@@ -51,6 +51,11 @@ const getAllUser = async (query: Record<string, string> = {}) => {
   };
 };
 
+const getSingleUser = async (id: string) => {
+  const user = User.findById(id);
+  return user;
+};
+
 const updateUser = async (id: string, payload: Partial<IUser>) => {
   const user = await User.findById(id);
   if (!user) {
@@ -76,6 +81,7 @@ const deleteUser = async (id: string) => {
 export const UserServices = {
   createUser,
   getAllUser,
+  getSingleUser,
   updateUser,
   deleteUser,
 };
