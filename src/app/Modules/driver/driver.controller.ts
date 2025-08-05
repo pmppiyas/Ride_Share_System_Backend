@@ -3,17 +3,20 @@ import httpStatus from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
 import { RiderServices } from "./driver.services";
 import catchAsync from "../../utils/catchAsync";
-
+import { JwtPayload } from "jsonwebtoken";
 const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId;
+    const user = req.user;
     const payload = req.body;
-    const result = await RiderServices.createDriver(userId, payload);
+    const result = await RiderServices.createDriver(
+      user as JwtPayload,
+      payload
+    );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "Driver create successfully",
+      message: "Driver create request successfully",
       data: result,
     });
   }

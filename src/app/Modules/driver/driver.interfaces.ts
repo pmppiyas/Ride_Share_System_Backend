@@ -10,6 +10,7 @@ export interface IVehicleInfo {
 export enum IDiverApprove {
   PENDING = "pending",
   APPROVED = "approved",
+  SUSPEND = "suspend",
   REFUSE = "refuse",
 }
 
@@ -25,6 +26,7 @@ export interface IDriverExtension {
   licenseNumber?: string;
   vehicleInfo?: IVehicleInfo;
   isAvailable?: boolean;
+  isOnline?: boolean;
   earnings?: number;
   approvalStatus?: IDiverApprove;
   rideStatus?: IDriverStatus;

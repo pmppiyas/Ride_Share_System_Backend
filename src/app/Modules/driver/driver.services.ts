@@ -9,13 +9,17 @@ import {
 } from "./driver.interfaces";
 import { Role } from "../user/user.interfaces";
 import { AppError } from "../../Error/appError";
+import { JwtPayload } from "jsonwebtoken";
 
-const createDriver = async (id: string, payload: IDriverExtension) => {
-  if (!Types.ObjectId.isValid(id)) {
+const createDriver = async (
+  decodedToken: JwtPayload,
+  payload: IDriverExtension
+) => {
+  if (!Types.ObjectId.isValid(decodedToken.userId)) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, "Invalid user ID");
   }
 
-  const user = await User.findById(id);
+  const user = await User.findById(decodedToken.userId);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -40,7 +44,8 @@ const createDriver = async (id: string, payload: IDriverExtension) => {
   user.role = Role.DRIVER;
   user.licenseNumber = payload.licenseNumber;
   user.vehicleInfo = payload.vehicleInfo;
-  user.isAvailable = payload.isAvailable ?? true;
+  user.isAvailable = true;
+  user.isOnline = true;
   user.earnings = payload.earnings ?? 0;
   user.approvalStatus = IDiverApprove.PENDING;
   user.rideStatus = IDriverStatus.IDLE;
@@ -83,7 +88,7 @@ const driverApprovalHandle = async (id: string, status: IDiverApprove) => {
   if (!status || !Object.values(IDiverApprove).includes(status)) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "Please provide a valid status (pending / approved/ refuse)."
+      "Please provide a valid status (pending / approved/ refuse/ suspend)."
     );
   }
 
