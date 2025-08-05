@@ -32,4 +32,8 @@ router.get(
   DriverControllers.allDrivers
 );
 
+router.get("/earnings", checkAuth(Role.DRIVER), DriverControllers.getMyEarn);
+// My order/ request
+// earning
+
 export const DriverRoutes = router;

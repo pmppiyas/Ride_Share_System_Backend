@@ -7,6 +7,7 @@ import {
   IDriverExtension,
   IDriverStatus,
 } from "./driver.interfaces";
+import { JwtPayload } from "jsonwebtoken";
 import { Role } from "../user/user.interfaces";
 import { AppError } from "../../Error/appError";
 
@@ -114,9 +115,32 @@ const allDrivers = async () => {
     },
   };
 };
-export const RiderServices = {
+
+const getMyEarn = async (decodedToken: JwtPayload) => {
+  const driver = await User.findById(decodedToken.userId);
+
+  if (
+    !driver ||
+    driver.role !== Role.DRIVER ||
+    driver.approvalStatus !== IDiverApprove.APPROVED
+  ) {
+    throw new Error("Unauthorized or driver not approved");
+  }
+
+  const totalEarnings = driver.earnings || 0;
+
+  return {
+    data: driver,
+    meta: {
+      totalEarnings,
+    },
+  };
+};
+
+export const DriverServices = {
   createDriver,
   allDriverRequest,
   driverApprovalHandle,
   allDrivers,
+  getMyEarn,
 };
