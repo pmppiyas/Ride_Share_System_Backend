@@ -1,7 +1,8 @@
 import { JwtPayload } from "jsonwebtoken";
 import { findNearbyDriver } from "../../utils/findNearDriver";
 import { Ride } from "./ride.model";
-import { IRideStatus } from "./ride.interfaces";
+import { IRide, IRideStatus } from "./ride.interfaces";
+import { HydratedDocument } from "mongoose";
 import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
@@ -32,7 +33,8 @@ const createRide = async (
   if (requestedRide) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "You already have an requested ride, Please cancel it first."
+      "You already have an requested ride, Please cancel it first.",
+      `Ride ID: ${requestedRide._id}`
     );
   }
 
@@ -92,14 +94,17 @@ const setRideStatus = async (
 ) => {
   const ride = await Ride.findById(rideId)
     .populate("rider", "-_id name phone")
-    .populate("driver", "-_id name phone");
-  if (!ride) throw new AppError(httpStatus.NOT_FOUND, "Ride not found");
+    .populate("driver", "-_id name phone rideStatus");
+
+  if (!ride || !ride.driver || !ride.rider) {
+    throw new AppError(httpStatus.NOT_FOUND, "Ride not found");
+  }
 
   if (!Object.values(IRideStatus).includes(status)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid ride status");
   }
 
-  const riderAllowedStatuses = [IRideStatus.ACCEPTED, IRideStatus.CANCELED];
+  const riderAllowedStatuses = [IRideStatus.COMPLETED, IRideStatus.CANCELED];
   const driverAllowedStatuses = Object.values(IRideStatus);
 
   const allowedStatuses =
@@ -131,6 +136,12 @@ const setRideStatus = async (
       `Cannot cancel a ride that is already ${ride.status}`
     );
   }
+  if (ride.status == IRideStatus.COMPLETED) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "This ride is already completed."
+    );
+  }
 
   ride.status = status;
 
@@ -148,6 +159,7 @@ const setRideStatus = async (
         isAvailable: false,
         rideStatus: IDriverStatus.ACCEPTED,
       });
+
       break;
 
     case IRideStatus.PICKED_UP:
@@ -176,7 +188,7 @@ const setRideStatus = async (
 
     case IRideStatus.CANCELED:
       ride.timestamps.canceledAt = new Date();
-      await User.findByIdAndUpdate(ride.driver.id, {
+      await User.findByIdAndUpdate(ride.driver._id, {
         isAvailable: true,
         rideStatus: IDriverStatus.IDLE,
       });

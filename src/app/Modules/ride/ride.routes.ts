@@ -2,12 +2,15 @@ import { Router } from "express";
 import { RideControllers } from "./ride.controller";
 import { checkAuth } from "../../middleware/checkAuth";
 import { Role } from "../user/user.interfaces";
+import { validateRequest } from "../../middleware/validateRequest";
+import { rideRequestSchema } from "./ride.valiadtion";
 
 const router = Router();
 
 router.post(
   "/create",
   checkAuth(...Object.values(Role)),
+  validateRequest(rideRequestSchema),
   RideControllers.createRide
 );
 
