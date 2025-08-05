@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
@@ -7,14 +8,14 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId;
+    const user = req.user as JwtPayload;
     const payload = req.body;
-    const result = await DriverServices.createDriver(userId, payload);
+    const result = await DriverServices.createDriver(user, payload);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "Driver create successfully",
+      message: "Driver create request successfully",
       data: result,
     });
   }
@@ -76,8 +77,18 @@ const getMyEarn = catchAsync(
   }
 );
 
+const getMyRideReq = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await DriverServices.getMyRideReq(req.user as JwtPayload);
 
-
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "My drive request retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const DriverControllers = {
   createDriver,
@@ -85,4 +96,5 @@ export const DriverControllers = {
   driverApproveHandle,
   allDrivers,
   getMyEarn,
+  getMyRideReq,
 };

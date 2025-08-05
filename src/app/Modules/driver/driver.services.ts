@@ -10,8 +10,13 @@ import {
 import { JwtPayload } from "jsonwebtoken";
 import { Role } from "../user/user.interfaces";
 import { AppError } from "../../Error/appError";
+import { Ride } from "../ride/ride.model";
 
-const createDriver = async (id: string, payload: IDriverExtension) => {
+const createDriver = async (
+  userToken: JwtPayload,
+  payload: IDriverExtension
+) => {
+  const id = userToken.userId;
   if (!Types.ObjectId.isValid(id)) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, "Invalid user ID");
   }
@@ -137,10 +142,22 @@ const getMyEarn = async (decodedToken: JwtPayload) => {
   };
 };
 
+const getMyRideReq = async (decodedToken: JwtPayload) => {
+  const driverId = decodedToken.userId;
+
+  const rides = await Ride.find({ driver: driverId }).sort({ createdAt: -1 });
+
+  return {
+    data: rides,
+    meta: rides.length,
+  };
+};
+
 export const DriverServices = {
   createDriver,
   allDriverRequest,
   driverApprovalHandle,
   allDrivers,
   getMyEarn,
+  getMyRideReq,
 };
