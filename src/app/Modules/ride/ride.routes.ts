@@ -8,7 +8,7 @@ import { rideRequestSchema } from "./ride.valiadtion";
 const router = Router();
 
 router.post(
-  "/create",
+  "/request",
   checkAuth(...Object.values(Role)),
   validateRequest(rideRequestSchema),
   RideControllers.createRide
