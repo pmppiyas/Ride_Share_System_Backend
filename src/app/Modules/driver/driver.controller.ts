@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
-import { RiderServices } from "./driver.services";
+import { DriverServices } from "./driver.services";
 import catchAsync from "../../utils/catchAsync";
 import { JwtPayload } from "jsonwebtoken";
+
 const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
@@ -12,6 +14,7 @@ const createDriver = catchAsync(
       user as JwtPayload,
       payload
     );
+
 
     sendResponse(res, {
       success: true,
@@ -24,7 +27,7 @@ const createDriver = catchAsync(
 
 const allDriverRequest = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await RiderServices.allDriverRequest();
+    const result = await DriverServices.allDriverRequest();
 
     sendResponse(res, {
       success: true,
@@ -38,7 +41,7 @@ const allDriverRequest = catchAsync(
 const driverApproveHandle = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { status } = req.body;
-    const result = await RiderServices.driverApprovalHandle(
+    const result = await DriverServices.driverApprovalHandle(
       req.params.id,
       status
     );
@@ -54,7 +57,7 @@ const driverApproveHandle = catchAsync(
 
 const allDrivers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await RiderServices.allDrivers();
+    const result = await DriverServices.allDrivers();
 
     sendResponse(res, {
       success: true,
@@ -65,9 +68,37 @@ const allDrivers = catchAsync(
   }
 );
 
+const getMyEarn = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await DriverServices.getMyEarn(req.user as JwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "My earnings retrieved successfully",
+      data: result,
+    });
+  }
+);
+
+const getMyRideReq = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await DriverServices.getMyRideReq(req.user as JwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "My drive request retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 export const DriverControllers = {
   createDriver,
   allDriverRequest,
   driverApproveHandle,
   allDrivers,
+  getMyEarn,
+  getMyRideReq,
 };

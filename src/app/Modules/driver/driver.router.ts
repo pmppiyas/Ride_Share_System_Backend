@@ -34,4 +34,13 @@ router.get(
 // My order/ request
 // earning
 
+router.get("/earnings", checkAuth(Role.DRIVER), DriverControllers.getMyEarn);
+router.get(
+  "/ride-history",
+  checkAuth(Role.DRIVER),
+  DriverControllers.getMyRideReq
+);
+// My order/ request
+// earning
+
 export const DriverRoutes = router;

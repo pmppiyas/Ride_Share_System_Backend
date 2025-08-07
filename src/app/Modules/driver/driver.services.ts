@@ -7,15 +7,19 @@ import {
   IDriverExtension,
   IDriverStatus,
 } from "./driver.interfaces";
+import { JwtPayload } from "jsonwebtoken";
 import { Role } from "../user/user.interfaces";
 import { AppError } from "../../Error/appError";
-import { JwtPayload } from "jsonwebtoken";
+
+import { Ride } from "../ride/ride.model";
+
 
 const createDriver = async (
   decodedToken: JwtPayload,
   payload: IDriverExtension
 ) => {
   if (!Types.ObjectId.isValid(decodedToken.userId)) {
+
     throw new AppError(httpStatus.NOT_ACCEPTABLE, "Invalid user ID");
   }
 
@@ -119,9 +123,44 @@ const allDrivers = async () => {
     },
   };
 };
-export const RiderServices = {
+
+const getMyEarn = async (decodedToken: JwtPayload) => {
+  const driver = await User.findById(decodedToken.userId);
+
+  if (
+    !driver ||
+    driver.role !== Role.DRIVER ||
+    driver.approvalStatus !== IDiverApprove.APPROVED
+  ) {
+    throw new Error("Unauthorized or driver not approved");
+  }
+
+  const totalEarnings = driver.earnings || 0;
+
+  return {
+    data: driver,
+    meta: {
+      totalEarnings,
+    },
+  };
+};
+
+const getMyRideReq = async (decodedToken: JwtPayload) => {
+  const driverId = decodedToken.userId;
+
+  const rides = await Ride.find({ driver: driverId }).sort({ createdAt: -1 });
+
+  return {
+    data: rides,
+    meta: rides.length,
+  };
+};
+
+export const DriverServices = {
   createDriver,
   allDriverRequest,
   driverApprovalHandle,
   allDrivers,
+  getMyEarn,
+  getMyRideReq,
 };
