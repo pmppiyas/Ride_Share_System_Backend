@@ -40,7 +40,5 @@ router.get(
   checkAuth(Role.DRIVER),
   DriverControllers.getMyRideReq
 );
-// My order/ request
-// earning
 
 export const DriverRoutes = router;

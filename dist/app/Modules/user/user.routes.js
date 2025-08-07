@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserRoutes = void 0;
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const user_validation_1 = require("./user.validation");
+const validateRequest_1 = require("../../middleware/validateRequest");
+const checkAuth_1 = require("../../middleware/checkAuth");
+const user_interfaces_1 = require("./user.interfaces");
+const router = (0, express_1.Router)();
+router.post("/register", (0, validateRequest_1.validateRequest)(user_validation_1.UserZodSchema), user_controller_1.UserController.createUser);
+router.get("/", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN), user_controller_1.UserController.getAllUsers);
+router.get("/single/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN), user_controller_1.UserController.getSingleUser);
+router.patch("/update/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN, user_interfaces_1.Role.DRIVER, user_interfaces_1.Role.RIDER), (0, validateRequest_1.validateRequest)(user_validation_1.UserZodSchema.partial()), user_controller_1.UserController.updateUser);
+router.delete("/delete/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN, user_interfaces_1.Role.DRIVER, user_interfaces_1.Role.RIDER), user_controller_1.UserController.deleteUser);
+exports.UserRoutes = router;
