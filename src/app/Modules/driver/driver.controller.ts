@@ -8,9 +8,13 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as JwtPayload;
+    const user = req.user;
     const payload = req.body;
-    const result = await DriverServices.createDriver(user, payload);
+    const result = await RiderServices.createDriver(
+      user as JwtPayload,
+      payload
+    );
+
 
     sendResponse(res, {
       success: true,
