@@ -71,10 +71,16 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
 
 const deleteUser = async (id: string) => {
   const user = await User.findById(id);
-  if (!user) {
-    throw new AppError(httpStatus.ACCEPTED, "User not found to delete.");
+  if (!user || user.isDeleted) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User not found or already deleted."
+    );
   }
-  const deleteUser = await User.findByIdAndDelete(id);
+
+  user.isDeleted = true;
+  await user.save();
+
   return deleteUser;
 };
 

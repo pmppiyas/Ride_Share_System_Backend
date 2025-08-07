@@ -98,15 +98,6 @@ const resetPassword = catchAsync(
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    let redirectTo =
-      req.query?.state && typeof req.query.state === "string"
-        ? req.query.state.replace(/^\//, "")
-        : "dashboard";
-
-    if (redirectTo.startsWith("/")) {
-      redirectTo = redirectTo.slice(1);
-    }
-
     const user = req.user;
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -115,13 +106,24 @@ const googleCallback = catchAsync(
 
     setAuthCookie(res, tokenInfo);
 
+    let redirectTo =
+      req.query?.state && typeof req.query.state === "string"
+        ? req.query.state.replace(/^\//, "")
+        : "dashboard";
+
+    if (redirectTo.startsWith("/")) {
+      redirectTo = redirectTo.slice(1);
+    }
+    if (req.query.json === "true") {
+      return sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Google login successfully",
+        data: tokenInfo,
+      });
+    }
+
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Google login successfully",
-      data: null,
-    });
   }
 );
 

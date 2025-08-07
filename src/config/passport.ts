@@ -25,12 +25,18 @@ passport.use(
         }
 
         let user = await User.findOne({ email });
+        const defaultCoordinates: [number, number] = [90.3563, 23.685];
 
         if (!user) {
           user = await User.create({
             email,
             name: profile.displayName,
             profileImage: profile.photos?.[0]?.value,
+            location: {
+              type: "Point",
+              coordinates: defaultCoordinates,
+              updatedAt: new Date(),
+            },
             role: Role.RIDER,
             auths: [
               {
@@ -64,7 +70,6 @@ passport.use(
 
         return done(null, user);
       } catch (error) {
-        console.log("Google Strategy Error", error);
         return done(error);
       }
     }

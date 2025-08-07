@@ -1,10 +1,9 @@
 import mongoose, { Schema, model } from "mongoose";
-import { IUser, IAuths, Role, IsActive } from "./user.interfaces";
+import { IAuths, Role, IsActive } from "./user.interfaces";
 mongoose.set("strictQuery", false);
 
 import {
   IDiverApprove,
-  IDriverExtension,
   IDriverStatus,
 } from "../driver/driver.interfaces";
 
@@ -17,7 +16,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, unique: true, index: true },
+    phone: { type: String },
     password: {
       type: String,
       required: function () {
@@ -34,7 +33,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
       },
       coordinates: {
         type: [Number],
-        required: true,
+        required: false,
       },
       updatedAt: {
         type: Date,

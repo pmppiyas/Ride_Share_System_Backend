@@ -27,7 +27,7 @@ export const UserZodSchema = z.object({
     .string()
     .min(6, { message: "Password must be at least 6 characters" })
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&^()_\-])[A-Za-z\d@$!%*?#&^()_\-]{6,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&^()_])[A-Za-z\d@$!%*?#&^()_]{6,}$/,
       {
         message:
           "Password must include uppercase, lowercase, number, and special character",

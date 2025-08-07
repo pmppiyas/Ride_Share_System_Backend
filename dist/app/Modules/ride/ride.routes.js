@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RideRoutes = void 0;
+const express_1 = require("express");
+const ride_controller_1 = require("./ride.controller");
+const checkAuth_1 = require("../../middleware/checkAuth");
+const user_interfaces_1 = require("../user/user.interfaces");
+const validateRequest_1 = require("../../middleware/validateRequest");
+const ride_valiadtion_1 = require("./ride.valiadtion");
+const router = (0, express_1.Router)();
+router.post("/request", (0, checkAuth_1.checkAuth)(...Object.values(user_interfaces_1.Role)), (0, validateRequest_1.validateRequest)(ride_valiadtion_1.rideRequestSchema), ride_controller_1.RideControllers.createRide);
+router.patch("/set-status/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.DRIVER, user_interfaces_1.Role.RIDER), ride_controller_1.RideControllers.setRideStatus);
+router.get("/", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN), ride_controller_1.RideControllers.getAllRides);
+router.get("/single/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.SUPER_ADMIN, user_interfaces_1.Role.ADMIN), ride_controller_1.RideControllers.getSingleRides);
+router.get("/my-rides", (0, checkAuth_1.checkAuth)(...Object.values(user_interfaces_1.Role)), ride_controller_1.RideControllers.getmyRides);
+exports.RideRoutes = router;
