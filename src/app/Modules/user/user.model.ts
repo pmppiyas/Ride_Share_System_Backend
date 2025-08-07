@@ -5,6 +5,7 @@ mongoose.set("strictQuery", false);
 import {
   IDiverApprove,
   IDriverStatus,
+  IDriverUser,
 } from "../driver/driver.interfaces";
 
 const authSchema = new Schema<IAuths>({
@@ -12,7 +13,7 @@ const authSchema = new Schema<IAuths>({
   providerId: { type: String, required: true },
 });
 
-const UserSchema = new Schema<IUser & IDriverExtension>(
+const UserSchema = new Schema<IDriverUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -73,6 +74,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
       plateNumber: String,
     },
     isAvailable: { type: Boolean },
+    isOnline: { type: Boolean },
     earnings: { type: Number },
     approvalStatus: {
       type: String,
@@ -95,7 +97,7 @@ const UserSchema = new Schema<IUser & IDriverExtension>(
   }
 );
 
-export const User = model<IUser & IDriverExtension>("User", UserSchema);
+export const User = model<IDriverUser>("User", UserSchema);
 
 UserSchema.pre("save", function (next) {
   if (this.role !== Role.DRIVER) {
@@ -106,6 +108,7 @@ UserSchema.pre("save", function (next) {
     delete this.earnings;
     delete this.approvalStatus;
     delete this.rideStatus;
+    delete this.isOnline;
   }
 
   next();

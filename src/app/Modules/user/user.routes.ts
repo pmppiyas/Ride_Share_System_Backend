@@ -20,7 +20,7 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/single/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   UserController.getSingleUser
 );
