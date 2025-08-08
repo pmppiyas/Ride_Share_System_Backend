@@ -31,8 +31,7 @@ router.get(
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   DriverControllers.allDrivers
 );
-// My order/ request
-// earning
+
 
 router.get("/earnings", checkAuth(Role.DRIVER), DriverControllers.getMyEarn);
 router.get(

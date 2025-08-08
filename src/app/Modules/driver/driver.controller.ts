@@ -10,11 +10,10 @@ const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
     const payload = req.body;
-    const result = await RiderServices.createDriver(
+    const result = await DriverServices.createDriver(
       user as JwtPayload,
       payload
     );
-
 
     sendResponse(res, {
       success: true,

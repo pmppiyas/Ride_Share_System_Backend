@@ -12,6 +12,6 @@ router.post("/register", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.RIDER
 router.get("/all-driver-request", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.ADMIN, user_interfaces_1.Role.SUPER_ADMIN), driver_controller_1.DriverControllers.allDriverRequest);
 router.patch("/request-handle/:id", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.ADMIN, user_interfaces_1.Role.SUPER_ADMIN), driver_controller_1.DriverControllers.driverApproveHandle);
 router.get("/", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.ADMIN, user_interfaces_1.Role.SUPER_ADMIN), driver_controller_1.DriverControllers.allDrivers);
-// My order/ request
-// earning
+router.get("/earnings", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.DRIVER), driver_controller_1.DriverControllers.getMyEarn);
+router.get("/ride-history", (0, checkAuth_1.checkAuth)(user_interfaces_1.Role.DRIVER), driver_controller_1.DriverControllers.getMyRideReq);
 exports.DriverRoutes = router;

@@ -1,8 +1,8 @@
 import { JwtPayload } from "jsonwebtoken";
 import { findNearbyDriver } from "../../utils/findNearDriver";
 import { Ride } from "./ride.model";
-import { IRide, IRideStatus } from "./ride.interfaces";
-import { HydratedDocument } from "mongoose";
+import { IRideStatus } from "./ride.interfaces";
+
 import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";

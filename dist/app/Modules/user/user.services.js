@@ -64,10 +64,11 @@ const updateUser = async (id, payload) => {
 };
 const deleteUser = async (id) => {
     const user = await user_model_1.User.findById(id);
-    if (!user) {
-        throw new appError_1.AppError(http_status_codes_1.default.ACCEPTED, "User not found to delete.");
+    if (!user || user.isDeleted) {
+        throw new appError_1.AppError(http_status_codes_1.default.NOT_FOUND, "User not found or already deleted.");
     }
-    const deleteUser = await user_model_1.User.findByIdAndDelete(id);
+    user.isDeleted = true;
+    await user.save();
     return deleteUser;
 };
 exports.UserServices = {

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RiderServices = void 0;
+exports.DriverServices = void 0;
 // src/app/modules/driver/driver.services.ts
 const user_model_1 = require("../user/user.model");
 const mongoose_1 = require("mongoose");
@@ -11,6 +11,7 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const driver_interfaces_1 = require("./driver.interfaces");
 const user_interfaces_1 = require("../user/user.interfaces");
 const appError_1 = require("../../Error/appError");
+const ride_model_1 = require("../ride/ride.model");
 const createDriver = async (decodedToken, payload) => {
     if (!mongoose_1.Types.ObjectId.isValid(decodedToken.userId)) {
         throw new appError_1.AppError(http_status_codes_1.default.NOT_ACCEPTABLE, "Invalid user ID");
@@ -86,9 +87,34 @@ const allDrivers = async () => {
         },
     };
 };
-exports.RiderServices = {
+const getMyEarn = async (decodedToken) => {
+    const driver = await user_model_1.User.findById(decodedToken.userId);
+    if (!driver ||
+        driver.role !== user_interfaces_1.Role.DRIVER ||
+        driver.approvalStatus !== driver_interfaces_1.IDiverApprove.APPROVED) {
+        throw new Error("Unauthorized or driver not approved");
+    }
+    const totalEarnings = driver.earnings || 0;
+    return {
+        data: driver,
+        meta: {
+            totalEarnings,
+        },
+    };
+};
+const getMyRideReq = async (decodedToken) => {
+    const driverId = decodedToken.userId;
+    const rides = await ride_model_1.Ride.find({ driver: driverId }).sort({ createdAt: -1 });
+    return {
+        data: rides,
+        meta: rides.length,
+    };
+};
+exports.DriverServices = {
     createDriver,
     allDriverRequest,
     driverApprovalHandle,
     allDrivers,
+    getMyEarn,
+    getMyRideReq,
 };

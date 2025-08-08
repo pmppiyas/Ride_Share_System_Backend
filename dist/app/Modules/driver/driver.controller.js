@@ -11,7 +11,7 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const createDriver = (0, catchAsync_1.default)(async (req, res, next) => {
     const user = req.user;
     const payload = req.body;
-    const result = await driver_services_1.RiderServices.createDriver(user, payload);
+    const result = await driver_services_1.DriverServices.createDriver(user, payload);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -20,7 +20,7 @@ const createDriver = (0, catchAsync_1.default)(async (req, res, next) => {
     });
 });
 const allDriverRequest = (0, catchAsync_1.default)(async (req, res, next) => {
-    const result = await driver_services_1.RiderServices.allDriverRequest();
+    const result = await driver_services_1.DriverServices.allDriverRequest();
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -30,7 +30,7 @@ const allDriverRequest = (0, catchAsync_1.default)(async (req, res, next) => {
 });
 const driverApproveHandle = (0, catchAsync_1.default)(async (req, res, next) => {
     const { status } = req.body;
-    const result = await driver_services_1.RiderServices.driverApprovalHandle(req.params.id, status);
+    const result = await driver_services_1.DriverServices.driverApprovalHandle(req.params.id, status);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -39,11 +39,29 @@ const driverApproveHandle = (0, catchAsync_1.default)(async (req, res, next) => 
     });
 });
 const allDrivers = (0, catchAsync_1.default)(async (req, res, next) => {
-    const result = await driver_services_1.RiderServices.allDrivers();
+    const result = await driver_services_1.DriverServices.allDrivers();
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
         message: "All driver retrieved successfully",
+        data: result,
+    });
+});
+const getMyEarn = (0, catchAsync_1.default)(async (req, res, next) => {
+    const result = await driver_services_1.DriverServices.getMyEarn(req.user);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.CREATED,
+        message: "My earnings retrieved successfully",
+        data: result,
+    });
+});
+const getMyRideReq = (0, catchAsync_1.default)(async (req, res, next) => {
+    const result = await driver_services_1.DriverServices.getMyRideReq(req.user);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.CREATED,
+        message: "My drive request retrieved successfully",
         data: result,
     });
 });
@@ -52,4 +70,6 @@ exports.DriverControllers = {
     allDriverRequest,
     driverApproveHandle,
     allDrivers,
+    getMyEarn,
+    getMyRideReq,
 };
