@@ -14,12 +14,13 @@ const findDriver = async (payload: {
   pickupLocation: { lat: number; lng: number; address?: string };
   destinationLocation: { lat: number; lng: number; address?: string };
 }) => {
+  console.log(payload);
   const driver = await findNearbyDriver(
     payload.pickupLocation.lat,
     payload.pickupLocation.lng
   );
 
-  if (!driver || driver.length === 0) {
+  if (!driver) {
     throw new AppError(httpStatus.NOT_FOUND, "No available driver nearby");
   }
 
@@ -75,6 +76,7 @@ const createRide = async (
     );
   }
 
+  console.log(driverId);
   const cleanId = driverId.trim();
 
   const driver = await User.findById({ _id: cleanId });
