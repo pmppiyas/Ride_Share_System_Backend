@@ -55,15 +55,25 @@ export class QueryBuilder<T> {
 
   paginate(): this {
     const page = Math.max(Number(this.query?.page) || 1, 1);
-    const limit = Math.max(Number(this.query?.limit) || 10, 1);
-    const skip = (page - 1) * limit;
+    const hasLimit = this.query?.limit !== undefined;
+    const limit = hasLimit ? Math.max(Number(this.query.limit), 1) : null;
 
-    this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+    if (limit) {
+      const skip = (page - 1) * limit;
+      this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+    }
+
     return this;
   }
 
-  build(): Query<T[], T> {
-    return this.modelQuery;
+  build(
+    populateFields: { path: string; select?: string }[] = []
+  ): Query<T[], T> {
+    let query = this.modelQuery;
+    for (const field of populateFields) {
+      query = query.populate(field.path, field.select || "");
+    }
+    return query;
   }
 
   async getMeta(): Promise<{
@@ -74,7 +84,8 @@ export class QueryBuilder<T> {
   }> {
     const total = await this.modelQuery.model.countDocuments();
     const page = Math.max(Number(this.query?.page) || 1, 1);
-    const limit = Math.max(Number(this.query?.limit) || 10, 1);
+    const hasLimit = this.query?.limit !== undefined;
+    const limit = hasLimit ? Math.max(Number(this.query.limit), 1) : 10;
     const totalPage = Math.ceil(total / limit);
 
     return { page, limit, total, totalPage };

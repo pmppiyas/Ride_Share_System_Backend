@@ -11,9 +11,7 @@ export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const accessToken =
-        envVars.NODE_ENV === "development"
-          ? req.headers.authorization
-          : req.cookies["access-token"];
+        req?.headers?.authorization || req?.cookies["access-token"];
 
       if (!accessToken) {
         throw new AppError(httpStatus.BAD_REQUEST, "No Token Received");
@@ -31,7 +29,7 @@ export const checkAuth = (...authRoles: string[]) => {
         );
       }
 
-      const isUserExist = await User.findOne({ email: verifiedToken.email });
+      const isUserExist = await User.findOne({ _id: verifiedToken.userId });
 
       if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");

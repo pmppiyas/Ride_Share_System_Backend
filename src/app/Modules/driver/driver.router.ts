@@ -28,11 +28,12 @@ router.patch(
 
 router.get(
   "/",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  DriverControllers.allDrivers
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.RIDER),
+  DriverControllers.getAllDrivers
 );
 
 router.get("/earnings", checkAuth(Role.DRIVER), DriverControllers.getMyEarn);
+
 router.get(
   "/ride-history",
   checkAuth(Role.DRIVER),

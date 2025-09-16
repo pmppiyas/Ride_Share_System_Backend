@@ -44,6 +44,21 @@ const credentialsLogin = catchAsync(
   }
 );
 
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user?.userId;
+    const data = await AuthServices.getMe(userId as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Self get Successfully",
+      data: data,
+    });
+  }
+);
+
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     clearAuthCookies(res);
@@ -98,6 +113,14 @@ const resetPassword = catchAsync(
 
 const googleCallback = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+    const tokenInfo = await createUserToken(user);
+    console.log(tokenInfo);
+    setAuthCookie(res, tokenInfo);
+
     let redirectTo =
       req.query?.state && typeof req.query.state === "string"
         ? req.query.state.replace(/^\//, "")
@@ -106,27 +129,22 @@ const googleCallback = catchAsync(
     if (redirectTo.startsWith("/")) {
       redirectTo = redirectTo.slice(1);
     }
-
-    const user = req.user;
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    if (req.query.json === "true") {
+      return sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Google login successfully",
+        data: tokenInfo,
+      });
     }
-    const tokenInfo = await createUserToken(user);
 
-    setAuthCookie(res, tokenInfo);
-
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Google login successfully",
-      data: null,
-    });
+    res.redirect(`${envVars.FRONTEND_URL1}/${redirectTo}`);
   }
 );
 
 export const AuthControllers = {
   googleCallback,
+  getMe,
   credentialsLogin,
   logout,
   getNewAccessToken,

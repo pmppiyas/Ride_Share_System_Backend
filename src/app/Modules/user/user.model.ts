@@ -1,16 +1,27 @@
-import { Schema, model } from "mongoose";
-import { IUser, IAuths, Role, IsActive } from "./user.interfaces";
+import mongoose, { Schema, model } from "mongoose";
+import { IAuths, Role, IsActive } from "./user.interfaces";
+mongoose.set("strictQuery", false);
+
+import {
+  IDiverApprove,
+  IDriverStatus,
+  IDriverUser,
+} from "../driver/driver.interfaces";
 
 const authSchema = new Schema<IAuths>({
   provider: { type: String, required: true },
   providerId: { type: String, required: true },
 });
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema<IDriverUser>(
   {
+    _id: {
+      type: Schema.Types.ObjectId,
+      default: () => new mongoose.Types.ObjectId(),
+    },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, unique: true, index: true },
+    phone: { type: String },
     password: {
       type: String,
       required: function () {
@@ -19,8 +30,20 @@ const UserSchema = new Schema<IUser>(
     },
     profileImage: { type: String },
     location: {
-      lat: { type: Number },
-      lng: { type: Number },
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: false,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
     role: {
       type: String,
@@ -43,6 +66,34 @@ const UserSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
+
+    //  Driver-specific fields
+    licenseNumber: { type: String, required: false },
+    vehicleInfo: {
+      type: {
+        type: String,
+        enum: ["car", "bike"],
+      },
+      model: String,
+      plateNumber: String,
+    },
+    isAvailable: { type: Boolean },
+    isOnline: { type: Boolean },
+    earnings: { type: Number },
+    approvalStatus: {
+      type: String,
+      enum: Object.values(IDiverApprove),
+    },
+    rideStatus: {
+      type: String,
+      enum: Object.values(IDriverStatus),
+    },
+    driveRides: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Ride",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -50,4 +101,21 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-export const User = model<IUser>("User", UserSchema);
+export const User = model<IDriverUser>("User", UserSchema);
+
+UserSchema.pre("save", function (next) {
+  if (this.role !== Role.DRIVER) {
+    delete this.driveRides;
+    delete this.licenseNumber;
+    delete this.vehicleInfo;
+    delete this.isAvailable;
+    delete this.earnings;
+    delete this.approvalStatus;
+    delete this.rideStatus;
+    delete this.isOnline;
+  }
+
+  next();
+});
+
+UserSchema.index({ location: "2dsphere" });

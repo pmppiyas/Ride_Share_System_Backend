@@ -17,7 +17,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: envVars.NODE_ENV === "production",
+      secure: envVars.NODE_ENV === "production" ? true : false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   })
@@ -26,9 +26,24 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.json());
-app.use(cors());
-app.use(cookieParser());
 
+const allowedOrigins = [envVars.FRONTEND_URL1, envVars.FRONTEND_URL2];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
+app.set("trust proxy", 1);
 app.use("/api/v1", router);
 
 app.get("/", async (req: Request, res: Response) => {

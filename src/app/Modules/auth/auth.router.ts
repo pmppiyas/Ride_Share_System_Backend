@@ -8,6 +8,8 @@ const router = Router();
 
 router.post("/login", AuthControllers.credentialsLogin);
 
+router.get("/getme", checkAuth(...Object.values(Role)), AuthControllers.getMe);
+
 router.post("/logout", AuthControllers.logout);
 
 router.post("/refresh-token", AuthControllers.getNewAccessToken);
@@ -24,7 +26,13 @@ router.get(
     const redirect = req.query.redirect || "/";
 
     passport.authenticate("google", {
-      scope: ["profile", "email"],
+      scope: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/user.phonenumbers.read",
+      ],
+      prompt: "consent",
+
       state: redirect as string,
     })(req, res, next);
   }
@@ -35,4 +43,5 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   AuthControllers.googleCallback
 );
+
 export const AuthRoutes = router;
