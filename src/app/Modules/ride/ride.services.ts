@@ -1,20 +1,19 @@
-import { JwtPayload } from "jsonwebtoken";
-import { findNearbyDriver } from "../../utils/findNearDriver";
-import { Ride } from "./ride.model";
-import { IRideStatus } from "./ride.interfaces";
-
-import { AppError } from "../../Error/appError";
 import httpStatus from "http-status-codes";
-import { User } from "../user/user.model";
-import { IDriverStatus } from "../driver/driver.interfaces";
+import { JwtPayload } from "jsonwebtoken";
+import { mongoose } from "mongoose";
+import { AppError } from "../../Error/appError";
+import { findNearbyDriver } from "../../utils/findNearDriver";
 import { QueryBuilder } from "../../utils/QueryBuilder";
+import { IDriverStatus } from "../driver/driver.interfaces";
 import { Role } from "../user/user.interfaces";
+import { User } from "../user/user.model";
+import { IRideStatus } from "./ride.interfaces";
+import { Ride } from "./ride.model";
 
 const findDriver = async (payload: {
   pickupLocation: { lat: number; lng: number; address?: string };
   destinationLocation: { lat: number; lng: number; address?: string };
 }) => {
-  console.log(payload);
   const driver = await findNearbyDriver(
     payload.pickupLocation.lat,
     payload.pickupLocation.lng
@@ -76,7 +75,6 @@ const createRide = async (
     );
   }
 
-  console.log(driverId);
   const cleanId = driverId.trim();
 
   const driver = await User.findById({ _id: cleanId });
@@ -116,16 +114,21 @@ const setRideStatus = async (
   action: IRideStatus,
   decodedToken: JwtPayload
 ) => {
+  // ✅ Validate ObjectId format
+  if (!mongoose.Types.ObjectId.isValid(rideId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid ride ID format");
+  }
+
   const ride = await Ride.findById(rideId)
     .populate("rider", "-_id name phone")
     .populate("driver", "-_id name phone rideStatus");
 
-  if (!ride || !ride.rider) {
+  if (!ride) {
     throw new AppError(httpStatus.NOT_FOUND, "Ride not found.");
   }
 
   if (!Object.values(IRideStatus).includes(action)) {
-    throw new AppError(httpStatus.EXPECTATION_FAILED, "Invalid ride status");
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid ride status");
   }
 
   const riderAllowedStatuses = [IRideStatus.COMPLETED, IRideStatus.CANCELED];
@@ -139,7 +142,7 @@ const setRideStatus = async (
   if (!allowedStatuses.includes(action)) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      `You are not allowed to set status to ${action}. Only Driver can do this.`
+      `You are not allowed to set status to '${action}'.`
     );
   }
 
@@ -160,7 +163,8 @@ const setRideStatus = async (
       `Cannot cancel a ride that is already ${ride.status}`
     );
   }
-  if (ride.status == IRideStatus.COMPLETED) {
+
+  if (ride.status === IRideStatus.COMPLETED) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "This ride is already completed."
@@ -170,65 +174,180 @@ const setRideStatus = async (
   ride.status = action;
 
   if (!ride.timestamps) {
-    throw new AppError(httpStatus.NOT_FOUND, "Unable to find timestamps");
+    throw new AppError(httpStatus.NOT_FOUND, "Ride timestamps not found.");
   }
-  // if (!ride.driver) {
-  //   throw new AppError(httpStatus.NOT_FOUND, "Driver ID Not Found.");
-  // }
 
-  // switch (action) {
-  //   case IRideStatus.ACCEPTED:
-  //     ride.timestamps.acceptedAt = new Date();
-  //     await User.findByIdAndUpdate(ride.driver._id, {
-  //       isAvailable: false,
-  //       rideStatus: IDriverStatus.ACCEPTED,
-  //     });
+  if (!ride.driver) {
+    throw new AppError(httpStatus.METHOD_FAILURE, "Doctor not found");
+  }
 
-  //     break;
+  switch (action) {
+    case IRideStatus.ACCEPTED:
+      ride.timestamps.acceptedAt = new Date();
+      await User.findByIdAndUpdate(ride.driver._id, {
+        isAvailable: false,
+        rideStatus: "accepted",
+      });
+      break;
 
-  //   case IRideStatus.PICKED_UP:
-  //     ride.timestamps.pickedUpAt = new Date();
-  //     await User.findByIdAndUpdate(ride.driver._id, {
-  //       isAvailable: false,
-  //       rideStatus: IDriverStatus.PICKEDUP,
-  //     });
-  //     break;
+    case IRideStatus.PICKED_UP:
+      ride.timestamps.pickedUpAt = new Date();
+      await User.findByIdAndUpdate(ride.driver._id, {
+        isAvailable: false,
+        rideStatus: "picked_up",
+      });
+      break;
 
-  //   case IRideStatus.IN_TRANSIT:
-  //     await User.findByIdAndUpdate(ride.driver._id, {
-  //       isAvailable: false,
-  //       rideStatus: IDriverStatus.INTRANSIT,
-  //     });
-  //     break;
+    case IRideStatus.IN_TRANSIT:
+      await User.findByIdAndUpdate(ride.driver._id, {
+        isAvailable: false,
+        rideStatus: "in_transit",
+      });
+      break;
 
-  //   case IRideStatus.COMPLETED:
-  //     ride.timestamps.completedAt = new Date();
-  //     await User.findByIdAndUpdate(ride.driver._id, {
-  //       $inc: { earnings: ride.fare ?? 0 },
-  //       isAvailable: true,
-  //       rideStatus: IDriverStatus.COMPLETED,
-  //     });
-  //     break;
+    case IRideStatus.COMPLETED:
+      ride.timestamps.completedAt = new Date();
+      await User.findByIdAndUpdate(ride.driver._id, {
+        $inc: { earnings: ride.fare ?? 0 },
+        isAvailable: true,
+        rideStatus: "completed",
+      });
+      break;
 
-  //   case IRideStatus.CANCELED:
-  //     ride.timestamps.canceledAt = new Date();
-  //     await User.findByIdAndUpdate(ride.driver._id, {
-  //       isAvailable: true,
-  //       rideStatus: IDriverStatus.IDLE,
-  //     });
-  //     break;
-  // }
+    case IRideStatus.CANCELED:
+      ride.timestamps.canceledAt = new Date();
+      await User.findByIdAndUpdate(ride.driver._id, {
+        isAvailable: true,
+        rideStatus: "idle",
+      });
+      break;
+  }
 
   await ride.save();
+
   return ride;
 };
 
-const getAllRides = async (query: Record<string, string> = {}) => {
+// const setRideStatus = async (
+//   rideId: string,
+//   action: IRideStatus,
+//   decodedToken: JwtPayload
+// ) => {
+//   const ride = await Ride.findById(rideId)
+//     .populate("rider", "-_id name phone")
+//     .populate("driver", "-_id name phone rideStatus");
+
+//   if (!ride || !ride.rider) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Ride not found.");
+//   }
+
+//   if (!Object.values(IRideStatus).includes(action)) {
+//     throw new AppError(httpStatus.EXPECTATION_FAILED, "Invalid ride status");
+//   }
+//   console.log("Action=>.. ", action);
+
+//   const riderAllowedStatuses = [IRideStatus.COMPLETED, IRideStatus.CANCELED];
+//   const driverAllowedStatuses = Object.values(IRideStatus);
+
+//   const allowedStatuses =
+//     decodedToken.role === Role.DRIVER
+//       ? driverAllowedStatuses
+//       : riderAllowedStatuses;
+
+//   if (!allowedStatuses.includes(action)) {
+//     throw new AppError(
+//       httpStatus.FORBIDDEN,
+//       `You are not allowed to set status to ${action}. Only Driver can do this.`
+//     );
+//   }
+
+//   const irreversibleStatuses = [
+//     IRideStatus.PICKED_UP,
+//     IRideStatus.IN_TRANSIT,
+//     IRideStatus.COMPLETED,
+//     IRideStatus.CANCELED,
+//   ];
+
+//   if (
+//     action === IRideStatus.CANCELED &&
+//     irreversibleStatuses.includes(ride.status) &&
+//     decodedToken.role !== Role.DRIVER
+//   ) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       `Cannot cancel a ride that is already ${ride.status}`
+//     );
+//   }
+//   if (ride.status == IRideStatus.COMPLETED) {
+//     throw new AppError(
+//       httpStatus.NOT_ACCEPTABLE,
+//       "This ride is already completed."
+//     );
+//   }
+
+//   ride.status = action;
+
+//   if (!ride.timestamps) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Unable to find timestamps");
+//   }
+//   if (!ride.driver) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Driver ID Not Found.");
+//   }
+
+//   switch (action) {
+//     case IRideStatus.ACCEPTED:
+//       ride.timestamps.acceptedAt = new Date();
+//       await User.findByIdAndUpdate(ride.driver._id, {
+//         isAvailable: false,
+//         rideStatus: IDriverStatus.ACCEPTED,
+//       });
+
+//       break;
+
+//     case IRideStatus.PICKED_UP:
+//       ride.timestamps.pickedUpAt = new Date();
+//       await User.findByIdAndUpdate(ride.driver._id, {
+//         isAvailable: false,
+//         rideStatus: IDriverStatus.PICKEDUP,
+//       });
+//       break;
+
+//     case IRideStatus.IN_TRANSIT:
+//       await User.findByIdAndUpdate(ride.driver._id, {
+//         isAvailable: false,
+//         rideStatus: IDriverStatus.INTRANSIT,
+//       });
+//       break;
+
+//     case IRideStatus.COMPLETED:
+//       ride.timestamps.completedAt = new Date();
+//       await User.findByIdAndUpdate(ride.driver._id, {
+//         $inc: { earnings: ride.fare ?? 0 },
+//         isAvailable: true,
+//         rideStatus: IDriverStatus.COMPLETED,
+//       });
+//       break;
+
+//     case IRideStatus.CANCELED:
+//       ride.timestamps.canceledAt = new Date();
+//       await User.findByIdAndUpdate(ride.driver._id, {
+//         isAvailable: true,
+//         rideStatus: IDriverStatus.IDLE,
+//       });
+//       break;
+//   }
+
+//   await ride.save();
+//   return ride;
+// };
+
+export const getAllRides = async (query: Record<string, string> = {}) => {
   const rideSearchableFields = [
     "status",
     "pickupLocation.address",
     "destinationLocation.address",
   ];
+
   const queryBuilder = new QueryBuilder(Ride.find(), query)
     .filter()
     .search(rideSearchableFields)
@@ -241,14 +360,43 @@ const getAllRides = async (query: Record<string, string> = {}) => {
       { path: "driver", select: "-_id name phone" },
       { path: "rider", select: "-_id name phone" },
     ]),
-
     queryBuilder.getMeta(),
   ]);
 
-  return {
-    rides: data,
-    meta,
+  // 🟩 Calculate summary stats
+  const [totalRevenueResult, statusCounts] = await Promise.all([
+    Ride.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, totalRevenue: { $sum: "$fare" } } },
+    ]),
+    Ride.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+  ]);
+
+  const totalRevenue = totalRevenueResult[0]?.totalRevenue || 0;
+
+  // 🟢 Normalize statuses
+  const normalizeStatus = (status: string) => {
+    const map: Record<string, string> = {
+      completed: "completed",
+      inProgress: "in-progress",
+      in_progress: "in-progress",
+      active: "in-progress",
+      cancelled: "cancelled",
+      pending: "pending",
+    };
+    return map[status] || status;
   };
+
+  const summary = {
+    totalRevenue,
+    statusCounts: statusCounts.reduce((acc, cur) => {
+      const key = normalizeStatus(cur._id);
+      acc[key] = (acc[key] || 0) + cur.count;
+      return acc;
+    }, {} as Record<string, number>),
+  };
+
+  return { rides: data, meta, summary };
 };
 
 const getSingleRide = async (id: string) => {

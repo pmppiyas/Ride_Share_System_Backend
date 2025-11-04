@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response, NextFunction } from "express";
-import { envVars } from "../../config/env";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import { envVars } from "../../config/env";
 import { AppError } from "../Error/appError";
 import {
   handleDuplicateError,
@@ -47,6 +47,8 @@ export const globalErrorHandler = (
     success: false,
     message: message,
     err,
-    stack: envVars.NODE_ENV === "development" ? err.stack : "",
+    stack: err.stack,
   });
 };
+
+// envVars.NODE_ENV === "development" ? err.stack : "",

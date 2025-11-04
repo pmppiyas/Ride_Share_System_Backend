@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { DriverServices } from "./driver.services";
-import catchAsync from "../../utils/catchAsync";
-import { JwtPayload } from "jsonwebtoken";
 
 const createDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

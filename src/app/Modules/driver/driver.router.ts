@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { DriverControllers } from "./driver.controller";
 import { checkAuth } from "../../middleware/checkAuth";
-import { Role } from "../user/user.interfaces";
 import { validateRequest } from "../../middleware/validateRequest";
+import { Role } from "../user/user.interfaces";
+import { DriverControllers } from "./driver.controller";
 import { driverExtensionSchema } from "./driver.validation";
 
 const router = Router();
@@ -28,7 +28,7 @@ router.patch(
 
 router.get(
   "/",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.RIDER),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.RIDER, Role.DRIVER),
   DriverControllers.getAllDrivers
 );
 

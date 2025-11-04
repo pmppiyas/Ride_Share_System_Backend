@@ -1,10 +1,10 @@
-import { IAuths, IUser, Role } from "./user.interfaces";
+import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import { User } from "./user.model";
+import { AppError } from "../../Error/appError";
 import { hashingPassword } from "../../utils/hashingPassword";
 import { QueryBuilder } from "../../utils/QueryBuilder";
-import { AppError } from "../../Error/appError";
-import httpStatus from "http-status-codes";
+import { IAuths, IUser, Role } from "./user.interfaces";
+import { User } from "./user.model";
 const createUser = async (payload: IUser) => {
   console.log(payload);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -6,7 +6,7 @@ import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status-codes";
 import { User } from "../Modules/user/user.model";
 import { IsActive } from "../Modules/user/user.interfaces";
-
+import { Types } from "mongoose";
 export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -29,7 +29,11 @@ export const checkAuth = (...authRoles: string[]) => {
         );
       }
 
-      const isUserExist = await User.findOne({ _id: verifiedToken.userId });
+      if (!Types.ObjectId.isValid(verifiedToken.userId)) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid user ID format");
+      }
+
+      const isUserExist = await User.findById(verifiedToken.userId);
 
       if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");

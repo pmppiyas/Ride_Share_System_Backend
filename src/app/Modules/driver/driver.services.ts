@@ -1,17 +1,17 @@
 // src/app/modules/driver/driver.services.ts
-import { Types } from "mongoose";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import { Types } from "mongoose";
+import { AppError } from "../../Error/appError";
+import { Role } from "../user/user.interfaces";
 import {
   IDiverApprove,
   IDriverExtension,
   IDriverStatus,
 } from "./driver.interfaces";
-import { JwtPayload } from "jsonwebtoken";
-import { Role } from "../user/user.interfaces";
-import { AppError } from "../../Error/appError";
 
-import { Ride } from "../ride/ride.model";
 import { QueryBuilder } from "../../utils/QueryBuilder";
+import { Ride } from "../ride/ride.model";
 import { User } from "../user/user.model";
 
 const createDriver = async (
@@ -167,11 +167,39 @@ const getMyEarn = async (decodedToken: JwtPayload) => {
 const getMyRideReq = async (decodedToken: JwtPayload) => {
   const driverId = decodedToken.userId;
 
+  // Fetch all rides for this driver
   const rides = await Ride.find({ driver: driverId }).sort({ createdAt: -1 });
+
+  // Calculate ride counts by status
+  const statusCounts = rides.reduce((acc, ride) => {
+    acc[ride.status] = (acc[ride.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Total revenue from completed rides
+  const totalRevenue = rides
+    .filter((r) => r.status === "completed")
+    .reduce((sum, r) => sum + (r.fare || 0), 0);
+
+  // Weekly revenue grouping (example by day)
+  const weeklyRevenue = {};
+  rides.forEach((ride) => {
+    if (ride.status === "completed" && ride.createdAt) {
+      const day = new Date(ride.createdAt).toLocaleDateString("en-US", {
+        weekday: "short",
+      });
+      weeklyRevenue[day] = (weeklyRevenue[day] || 0) + (ride.fare || 0);
+    }
+  });
 
   return {
     data: rides,
-    meta: rides.length,
+    meta: { total: rides.length },
+    summary: {
+      totalRevenue,
+      statusCounts,
+      weeklyRevenue,
+    },
   };
 };
 

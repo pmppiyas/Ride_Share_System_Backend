@@ -1,13 +1,13 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Request, Response } from "express";
-import cookieParser from "cookie-parser";
-import router from "./app/Routes/index";
-import passport from "passport";
 import session from "express-session";
+import passport from "passport";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
-import "./config/passport";
+import router from "./app/Routes/index";
 import { envVars } from "./config/env";
+import "./config/passport";
 
 const app = express();
 
@@ -27,7 +27,11 @@ app.use(passport.session());
 
 app.use(express.json());
 
-const allowedOrigins = [envVars.FRONTEND_URL1, envVars.FRONTEND_URL2];
+const allowedOrigins = [
+  "http://localhost:5173",
+  envVars.FRONTEND_URL1,
+  envVars.FRONTEND_URL2,
+];
 
 app.use(
   cors({

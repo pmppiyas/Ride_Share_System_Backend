@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { RideControllers } from "./ride.controller";
 import { checkAuth } from "../../middleware/checkAuth";
-import { Role } from "../user/user.interfaces";
 import { validateRequest } from "../../middleware/validateRequest";
+import { Role } from "../user/user.interfaces";
+import { RideControllers } from "./ride.controller";
 import { rideRequestSchema } from "./ride.valiadtion";
 
 const router = Router();
@@ -20,8 +20,8 @@ router.post(
   RideControllers.createRide
 );
 
-router.put(
-  "/set-status/:id",
+router.patch(
+  "/set-status/:id/:status",
   checkAuth(Role.DRIVER, Role.RIDER),
   RideControllers.setRideStatus
 );

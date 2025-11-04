@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction } from "express";
-import catchAsync from "../../utils/catchAsync";
-import { RideServices } from "./ride.services";
-import sendResponse from "../../utils/sendResponse";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import { rideStatusSchema } from "./ride.valiadtion";
 import { AppError } from "../../Error/appError";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import { IRideStatus } from "./ride.interfaces";
+import { RideServices } from "./ride.services";
+import { rideStatusSchema } from "./ride.valiadtion";
 
 const findDriver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -42,23 +42,20 @@ const createRide = catchAsync(
 
 const setRideStatus = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const result = rideStatusSchema.safeParse(req.body.status);
+    console.log("params => ", req.params);
 
-    // if (!result.success) {
-    //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid ride status");
-    // }
+    const { id, status } = req.params;
 
-    const setStatus = await RideServices.setRideStatus(
-      req.params.id,
-      req.body.status as IRideStatus,
+    const ride = await RideServices.setRideStatus(
+      id,
+      status as IRideStatus,
       req.user as JwtPayload
     );
 
-    sendResponse(res, {
+    res.status(httpStatus.OK).json({
       success: true,
-      statusCode: httpStatus.CREATED,
-      message: `Ride ${req.params.id} successfully`,
-      data: setStatus,
+      message: "Ride status updated successfully.",
+      data: ride,
     });
   }
 );
