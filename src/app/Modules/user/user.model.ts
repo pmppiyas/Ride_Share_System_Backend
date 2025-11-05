@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import { IAuths, Role, IsActive } from "./user.interfaces";
+import { IAuths, IsActive, Role } from "./user.interfaces";
 mongoose.set("strictQuery", false);
 
 import {

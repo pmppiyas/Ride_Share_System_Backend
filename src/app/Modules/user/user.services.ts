@@ -1,15 +1,16 @@
 import httpStatus from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
 import { AppError } from "../../Error/appError";
 import { hashingPassword } from "../../utils/hashingPassword";
+import { randomLocationWithinRadius } from "../../utils/locationGenerate";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { IAuths, IUser, Role } from "./user.interfaces";
 import { User } from "./user.model";
-const createUser = async (payload: IUser) => {
-  console.log(payload);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { auths, email, password, role, ...rest } = payload;
 
+// 📍 Dhaka center [lng, lat]
+const DHAKA_CENTER: [number, number] = [90.4125, 23.8103];
+
+export const createUser = async (payload: IUser) => {
+  const { auths, email, password, role, location, ...rest } = payload;
   let hashPassword = "";
   if (password) {
     hashPassword = await hashingPassword(password);
@@ -20,17 +21,27 @@ const createUser = async (payload: IUser) => {
     providerId: email as string,
   };
 
+  let userLocation = location;
+
+  const randomCoords = randomLocationWithinRadius(DHAKA_CENTER, 10);
+  userLocation = {
+    type: "Point",
+    coordinates: randomCoords,
+    updatedAt: new Date(),
+  };
+
   const user = await User.create({
     email,
     password: hashPassword,
-    role: Role.RIDER,
+    role: role || Role.RIDER,
     auths: [authProvider],
+    location: userLocation,
     ...rest,
   });
 
-  const UserObj = user.toObject();
-  delete UserObj.password;
-  return UserObj;
+  const userObj = user.toObject();
+  delete userObj.password;
+  return userObj;
 };
 
 const getAllUser = async (query: Record<string, string> = {}) => {
@@ -59,24 +70,12 @@ const getSingleUser = async (id: string) => {
   return user;
 };
 
-const updateUser = async (
-  userId: string,
-  payload: Partial<IUser>,
-  decodedToken: JwtPayload
-) => {
+const updateUser = async (userId: string, payload: Partial<IUser>) => {
   const ifUserExist = await User.findById(userId);
 
   if (!ifUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
   }
-
-  // if (payload.password) {
-  //   payload.password = await bcryptjs.hash(
-  //     payload.password,
-  //     envVars.BCRYPT_SALT_ROUND
-  //   );
-  // }
-  console.log(payload);
 
   const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true,
